@@ -7,7 +7,7 @@ const StatusBar = () => {
 
   return (
     <NativeStatusBar
-      backgroundColor={theme.colors.$background || 'white'}
+      backgroundColor={theme.colors.$background || 'red'}
       animated={true}
       barStyle={theme.statusBar.barStyle}
     />

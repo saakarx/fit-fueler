@@ -10,6 +10,9 @@ import {
   composeRestyleFunctions,
   layout,
   LayoutProps,
+  opacity,
+  OpacityProps,
+  PositionProps,
   spacing,
   SpacingProps,
   spacingShorthand,
@@ -17,10 +20,9 @@ import {
   typography,
   TypographyProps,
   useRestyle,
-  useTheme,
 } from '@shopify/restyle';
+import { LinearGradient as RNLinearGradient } from 'expo-linear-gradient';
 import React, { forwardRef } from 'react';
-import { TextInput as NativeTextInput } from 'react-native';
 
 import { Theme } from '@src/themes';
 
@@ -31,7 +33,9 @@ type RestyleProps = SpacingProps<Theme> &
   BackgroundColorShorthandProps<Theme> &
   ColorProps<Theme> &
   TypographyProps<Theme> &
-  LayoutProps<Theme>;
+  LayoutProps<Theme> &
+  Omit<PositionProps<Theme>, 'start' | 'end'> &
+  OpacityProps<Theme>;
 
 const restyleFunctions = composeRestyleFunctions<Theme, RestyleProps>([
   color,
@@ -42,32 +46,28 @@ const restyleFunctions = composeRestyleFunctions<Theme, RestyleProps>([
   backgroundColorShorthand,
   typography,
   layout,
+  opacity,
 ]);
 
-export type TextInputProps = Omit<
-  React.ComponentPropsWithRef<typeof NativeTextInput>,
-  'placeholderTextColor'
+export type LinearGradientProps = React.ComponentPropsWithRef<
+  typeof RNLinearGradient
 > &
-  RestyleProps & {
-    placeholderColor?: keyof Theme['colors'];
-  };
+  RestyleProps & {};
 
-const TextInput = forwardRef<NativeTextInput, TextInputProps>(
-  ({ placeholderColor, ...rest }, ref) => {
+const LinearGradient = forwardRef<RNLinearGradient, LinearGradientProps>(
+  ({ colors, start, end, ...rest }, ref) => {
     const props = useRestyle(restyleFunctions, rest);
-    const theme = useTheme<Theme>();
-
-    const placeholderTextColorValue =
-      placeholderColor && theme.colors[placeholderColor];
 
     return (
-      <NativeTextInput
+      <RNLinearGradient
+        colors={colors}
+        start={start}
+        end={end}
         ref={ref}
         {...props}
-        placeholderTextColor={placeholderTextColorValue}
       />
     );
   }
 );
 
-export default TextInput;
+export default LinearGradient;
