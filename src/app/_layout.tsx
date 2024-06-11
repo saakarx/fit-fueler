@@ -1,6 +1,7 @@
 import {
   WorkSans_400Regular,
   WorkSans_500Medium,
+  WorkSans_600SemiBold,
   useFonts,
 } from '@expo-google-fonts/work-sans';
 import { ThemeProvider } from '@shopify/restyle';
@@ -15,8 +16,10 @@ SplashScreen.preventAutoHideAsync();
 
 const Layout = () => {
   const [fontsLoaded, fontsError] = useFonts({
+    BricolageGrotesque_400Regular: require('../../assets/BricolageGrotesque-Regular.ttf'),
     WorkSans_400Regular,
     WorkSans_500Medium,
+    WorkSans_600SemiBold,
   });
 
   useEffect(() => {
@@ -27,9 +30,11 @@ const Layout = () => {
 
   if (!fontsLoaded && !fontsError) return null;
 
+  const activeTheme = themes.find(i => i.id === 'dark') || themes[0]; // TODO:
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ThemeProvider theme={themes[1].theme}>
+      <ThemeProvider theme={activeTheme.theme}>
         <StatusBar />
         <Slot />
       </ThemeProvider>
