@@ -8,8 +8,6 @@ import {
   composeRestyleFunctions,
   opacity,
   OpacityProps,
-  ResponsiveValue,
-  useResponsiveProp,
   useRestyle,
   useTheme,
 } from '@shopify/restyle';
@@ -37,39 +35,39 @@ interface Props extends PressableProps {
   rippleBorderless?: boolean;
 }
 
-const Touchable = ({
-  pressed,
-  rippleColor,
-  rippleBorderless,
-  style,
-  ...rest
-}: Props) => {
-  const { style: pressedStyle } = pressed
-    ? useRestyle(restyleFunctions, pressed)
-    : { style: undefined };
-  const theme = useTheme<Theme>();
-  const rippleColorValue = rippleColor && theme.colors[rippleColor];
+const Touchable = React.forwardRef<typeof Pressable, Props>(
+  ({ pressed, rippleColor, rippleBorderless, style, ...rest }, ref) => {
+    const { style: pressedStyle } = pressed
+      ? useRestyle(restyleFunctions, pressed)
+      : { style: undefined };
+    const theme = useTheme<Theme>();
+    const rippleColorValue = rippleColor && theme.colors[rippleColor];
 
-  return (
-    <Pressable
-      {...rest}
-      android_ripple={{
-        color: rippleColorValue,
-        borderless: rippleBorderless,
-      }}
-      style={({ pressed: isPressed }) =>
-        (isPressed ? [style, pressedStyle] : style) as StyleProp<ViewStyle>
-      }
+    return (
+      <Pressable
+        {...rest}
+        android_ripple={{
+          color: rippleColorValue,
+          borderless: rippleBorderless,
+        }}
+        style={({ pressed: isPressed }) =>
+          (isPressed ? [style, pressedStyle] : style) as StyleProp<ViewStyle>
+        }
+        ref={ref}
+      />
+    );
+  }
+);
+
+export const TouchableOpacity = React.forwardRef<typeof Pressable, Props>(
+  ({ ...props }, ref) => (
+    <Touchable
+      rippleColor='$foreground'
+      {...props}
+      pressed={{ opacity: Platform.select({ ios: 0.6, android: 0.6 }) }}
+      ref={ref}
     />
-  );
-};
-
-export const TouchableOpacity: React.FC<Props> = props => (
-  <Touchable
-    rippleColor='$foreground'
-    {...props}
-    pressed={{ opacity: Platform.select({ ios: 0.6, android: 0.6 }) }}
-  />
+  )
 );
 
 export default Touchable;
