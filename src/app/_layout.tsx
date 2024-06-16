@@ -5,12 +5,14 @@ import {
   useFonts,
 } from '@expo-google-fonts/work-sans';
 import { ThemeProvider } from '@shopify/restyle';
-import { Slot, SplashScreen } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
+import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StatusBar } from '@src/atoms';
-import { themes } from '@src/themes';
+import { activeThemeAtom } from '@src/states/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,6 +23,7 @@ const Layout = () => {
     WorkSans_500Medium,
     WorkSans_600SemiBold,
   });
+  const activeTheme = useAtomValue(activeThemeAtom);
 
   useEffect(() => {
     if (fontsLoaded || fontsError) {
@@ -30,15 +33,18 @@ const Layout = () => {
 
   if (!fontsLoaded && !fontsError) return null;
 
-  const activeTheme = themes.find(i => i.id === 'dark') || themes[0]; // TODO:
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ThemeProvider theme={activeTheme.theme}>
-        <StatusBar />
-        <Slot />
-      </ThemeProvider>
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ThemeProvider theme={activeTheme}>
+          <StatusBar />
+          <Stack
+            initialRouteName='(tabs)'
+            screenOptions={{ headerShown: false }}
+          />
+        </ThemeProvider>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 
