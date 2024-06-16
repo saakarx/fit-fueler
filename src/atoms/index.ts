@@ -7,6 +7,7 @@ import Text from './text';
 import TextInput from './text-input';
 import Touchable, { TouchableOpacity } from './touchable';
 
+export * from './bottom-sheet';
 export {
   Box,
   LinearGradient,

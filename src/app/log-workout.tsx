@@ -1,6 +1,8 @@
-import RNBottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetTextInput,
+  BottomSheetView,
+  BottomSheetModal as RNBottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import { router, Stack } from 'expo-router';
 import { useSetAtom } from 'jotai';
@@ -14,9 +16,10 @@ import {
 import { useRef, useState } from 'react';
 
 import { Box, Text, TouchableOpacity } from '@src/atoms';
-import BottomSheet from '@src/atoms/bottom-sheet';
+import { BottomSheetModal } from '@src/atoms/bottom-sheet';
 import Input from '@src/components/input';
 import LucideIcon from '@src/components/lucide-icon';
+
 import { addWorkoutLog } from '@src/states/log-workouts';
 
 const exercises = [
@@ -37,12 +40,12 @@ const LogWorkoutScreen = () => {
     id: string;
     name: string;
   } | null>(null);
-  const bottomSheetRef = useRef<RNBottomSheet>(null);
+  const bottomSheetRef = useRef<RNBottomSheetModal>(null);
   const addWorkoutLogItem = useSetAtom(addWorkoutLog);
 
   const handleOpenBottomSheet = () => {
     const { current: bottomSheet } = bottomSheetRef;
-    if (bottomSheet) bottomSheet.expand();
+    if (bottomSheet) bottomSheet.present();
   };
 
   return (
@@ -142,9 +145,9 @@ const LogWorkoutScreen = () => {
         ))}
       </Box>
 
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
+        index={1}
         backdropComponent={props => (
           <BottomSheetBackdrop
             {...props}
@@ -153,13 +156,16 @@ const LogWorkoutScreen = () => {
           />
         )}
         enablePanDownToClose={true}
-        snapPoints={['60%', '100%']}
+        snapPoints={['40%', '80%']}
+        detached={true}
         topInset={12}
+        bottomInset={12}
         keyboardBehavior='fillParent'
         keyboardBlurBehavior='restore'
-        onClose={() => setActiveExercise(null)}
+        onDismiss={() => setActiveExercise(null)}
+        style={{ marginHorizontal: 12 }}
       >
-        <Box flex={1} p='md'>
+        <BottomSheetView style={{ flex: 1, padding: 12 }}>
           <Text
             fontSize={24}
             fontWeight='600'
@@ -276,8 +282,8 @@ const LogWorkoutScreen = () => {
               <LucideIcon Icon={PlusIcon} stroke='black900' size={20} />
             </TouchableOpacity>
           </Box>
-        </Box>
-      </BottomSheet>
+        </BottomSheetView>
+      </BottomSheetModal>
     </Box>
   );
 };

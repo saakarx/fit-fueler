@@ -1,4 +1,8 @@
-import RNBottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetBackdrop,
+  BottomSheetView,
+  BottomSheetModal as RNBottomSheetModal,
+} from '@gorhom/bottom-sheet';
 import { useTheme } from '@shopify/restyle';
 import { Link } from 'expo-router';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -6,8 +10,7 @@ import { GlassWaterIcon, MinusIcon, PlusIcon } from 'lucide-react-native';
 import { useRef } from 'react';
 import { StyleProp, TextStyle } from 'react-native';
 
-import { Box, Text, TouchableOpacity } from '@src/atoms';
-import BottomSheet from '@src/atoms/bottom-sheet';
+import { Box, Text, TouchableOpacity, BottomSheetModal } from '@src/atoms';
 import LucideIcon from '@src/components/lucide-icon';
 import Separator from '@src/components/separator';
 
@@ -134,7 +137,7 @@ const AddWaterPill = ({
 
 const HomeScreen = () => {
   const theme = useTheme<Theme>();
-  const bottomSheetRef = useRef<RNBottomSheet>(null);
+  const bottomSheetRef = useRef<RNBottomSheetModal>(null);
 
   const meals = useAtomValue(loggedMeals);
   const workouts = useAtomValue(loggedWorkouts);
@@ -155,7 +158,7 @@ const HomeScreen = () => {
   const handleOpenSheet = () => {
     const { current: bottomSheet } = bottomSheetRef;
 
-    if (bottomSheet) bottomSheet.snapToPosition('50%');
+    if (bottomSheet) bottomSheet.present();
   };
 
   return (
@@ -347,9 +350,10 @@ const HomeScreen = () => {
         <Box height={70 + 32} />
       </Box>
 
-      <BottomSheet
+      <BottomSheetModal
+        name='water-log-bottom-sheet-modal'
         ref={bottomSheetRef}
-        index={-1}
+        index={1}
         backdropComponent={props => (
           <BottomSheetBackdrop
             {...props}
@@ -358,10 +362,14 @@ const HomeScreen = () => {
           />
         )}
         enablePanDownToClose={true}
+        detached={true}
         topInset={12}
-        snapPoints={['60%', '100%']}
+        bottomInset={12}
+        snapPoints={['30%', '60%']}
+        style={{ marginHorizontal: 12, zIndex: 1000 }}
+        enableDismissOnClose
       >
-        <Box flex={1} p='md'>
+        <BottomSheetView style={{ flex: 1, padding: 12 }}>
           <Text
             fontSize={24}
             fontWeight='600'
@@ -418,8 +426,8 @@ const HomeScreen = () => {
               />
             </TouchableOpacity>
           </Box>
-        </Box>
-      </BottomSheet>
+        </BottomSheetView>
+      </BottomSheetModal>
     </Box>
   );
 };
