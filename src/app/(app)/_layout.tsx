@@ -3,9 +3,14 @@ import { Fragment } from 'react';
 
 import { ScrollView } from '@src/atoms';
 import BottomBar from '@src/components/bottom-bar';
+import BottomBarProvider from '@src/context/bottom-bar';
 
 const RootLayout = () => {
-  return <Layout />;
+  return (
+    <BottomBarProvider>
+      <Layout />
+    </BottomBarProvider>
+  );
 };
 
 const Layout = () => {
