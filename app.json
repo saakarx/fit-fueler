@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fit-fueler",
+    "name": "Fit Fueler",
     "slug": "fit-fueler",
     "scheme": "fitfueler",
     "version": "1.0.0",
@@ -18,7 +18,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#212529"
         }
-      }
+      },
+      "bundleIdentifier": "com.saakar.fitfueler",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +35,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#212529"
         }
-      }
+      },
+      "package": "com.saakar.fitfueler",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -42,6 +46,19 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": ["expo-router", "expo-font"]
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ]
   }
 }
