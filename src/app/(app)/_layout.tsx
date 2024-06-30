@@ -1,11 +1,16 @@
-import { Slot } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { Fragment } from 'react';
 
-import { ScrollView } from '@src/atoms';
 import BottomBar from '@src/components/bottom-bar';
+
+import { useAuth } from '@src/context/auth';
 import BottomBarProvider from '@src/context/bottom-bar';
 
 const RootLayout = () => {
+  const { isLoggedIn } = useAuth();
+
+  if (!isLoggedIn) return <Redirect href='/signin' />;
+
   return (
     <BottomBarProvider>
       <Layout />
@@ -16,9 +21,7 @@ const RootLayout = () => {
 const Layout = () => {
   return (
     <Fragment>
-      <ScrollView flex={1} bg='$background'>
-        <Slot />
-      </ScrollView>
+      <Stack screenOptions={{ headerShown: false }} />
       <BottomBar />
     </Fragment>
   );
