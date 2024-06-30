@@ -1,12 +1,15 @@
-import { Slot } from 'expo-router';
+import { createBox } from '@shopify/restyle';
+import { Redirect, Slot } from 'expo-router';
 import {
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,
   Platform,
 } from 'react-native';
 
-import { createBox } from '@shopify/restyle';
 import { Box, ScrollView } from '@src/atoms';
+
+import { useAuth } from '@src/context/auth';
+
 import { Theme } from '@src/themes';
 
 const StyledKeyboardAvoidingView = createBox<Theme, KeyboardAvoidingViewProps>(
@@ -14,6 +17,10 @@ const StyledKeyboardAvoidingView = createBox<Theme, KeyboardAvoidingViewProps>(
 );
 
 const Layout = () => {
+  const { isLoggedIn } = useAuth();
+
+  if (isLoggedIn) return <Redirect href='/' />;
+
   return (
     <StyledKeyboardAvoidingView
       behavior={Platform.select({ ios: 'padding', android: 'height' })}

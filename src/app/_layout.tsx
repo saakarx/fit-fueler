@@ -2,8 +2,10 @@ import {
   WorkSans_400Regular,
   WorkSans_500Medium,
   WorkSans_600SemiBold,
+  WorkSans_700Bold_Italic,
   useFonts,
 } from '@expo-google-fonts/work-sans';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@shopify/restyle';
 import { SplashScreen, Stack } from 'expo-router';
 import { useAtomValue } from 'jotai';
@@ -12,7 +14,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StatusBar } from '@src/atoms';
+
 import { activeThemeAtom } from '@src/states/theme';
+
+import AuthProvider from '@src/context/auth';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +27,7 @@ const Layout = () => {
     WorkSans_400Regular,
     WorkSans_500Medium,
     WorkSans_600SemiBold,
+    WorkSans_700Bold_Italic,
   });
   const activeTheme = useAtomValue(activeThemeAtom);
 
@@ -34,17 +40,21 @@ const Layout = () => {
   if (!fontsLoaded && !fontsError) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <ThemeProvider theme={activeTheme}>
-          <StatusBar />
-          <Stack
-            initialRouteName='(tabs)'
-            screenOptions={{ headerShown: false }}
-          />
-        </ThemeProvider>
-      </SafeAreaView>
-    </GestureHandlerRootView>
+    <AuthProvider>
+      <ThemeProvider theme={activeTheme}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <BottomSheetModalProvider>
+            <SafeAreaView style={{ flex: 1 }}>
+              <StatusBar />
+              <Stack
+                initialRouteName='/(auth)/index'
+                screenOptions={{ headerShown: false }}
+              />
+            </SafeAreaView>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
