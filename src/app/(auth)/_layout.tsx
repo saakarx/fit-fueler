@@ -1,5 +1,6 @@
 import { createBox } from '@shopify/restyle';
 import { Redirect, Slot } from 'expo-router';
+import React from 'react';
 import {
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,

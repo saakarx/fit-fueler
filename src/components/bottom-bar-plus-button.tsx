@@ -1,5 +1,6 @@
+import { Link } from 'expo-router';
 import { DumbbellIcon, PlusIcon, UtensilsIcon } from 'lucide-react-native';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Modal, TouchableOpacity } from 'react-native';
 import {
   SafeAreaView,
@@ -9,7 +10,6 @@ import {
 import { Box, Text } from '@src/atoms';
 import { useBottomBar } from '@src/context/bottom-bar';
 import LucideIcon from './lucide-icon';
-import { Link } from 'expo-router';
 
 const popoverItems = [
   {
@@ -94,7 +94,7 @@ const BottomBarPlusButton = () => {
                 borderRightColor: 'transparent',
                 borderTopColor: 'transparent',
               }}
-              zIndex={-10}
+              zIndex={'-10'}
             />
 
             {popoverItems.map(({ icon, text, href }, idx) => (

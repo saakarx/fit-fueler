@@ -1,5 +1,5 @@
 import { Redirect, Stack } from 'expo-router';
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 
 import BottomBar from '@src/components/bottom-bar';
 

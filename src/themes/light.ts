@@ -15,6 +15,9 @@ const p = {
   pink: '#FEEAFA',
   purple: '#BDB2FF',
   lightGreen: '#BEE3DB',
+  red: '#DA4167',
+  yellow: '#FDFFB6',
+  lightBlue: '#9BF6FF',
 };
 
 const theme = createTheme({
@@ -38,6 +41,8 @@ const theme = createTheme({
     purple: p.purple,
     white: p.white300,
     lightGreen: p.lightGreen,
+    yellow: p.yellow,
+    lightBlue: p.lightBlue,
 
     activeBottomBarLink: '#9BF6FF',
     activeBottomBarItemBg: p.white700,
@@ -54,6 +59,8 @@ const theme = createTheme({
 
     $fieldInputPlaceholderTextColor: '#6C757D',
     $fieldInputBorderColor: '#454D54',
+
+    danger: p.red,
   },
   spacing: {
     '0': 0,
@@ -78,6 +85,17 @@ const theme = createTheme({
       fontSize: 16,
       fontFamily: 'WorkSans_400Regular',
     },
+  },
+  zIndices: {
+    '-1000': -1000,
+    '-100': -100,
+    '-10': -10,
+    '-1': -1,
+    0: 0,
+    1: 1,
+    10: 10,
+    100: 100,
+    1000: 1000,
   },
 });
 

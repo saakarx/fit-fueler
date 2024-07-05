@@ -12,7 +12,7 @@ import {
   UserRoundIcon,
   UserRoundPlusIcon,
 } from 'lucide-react-native';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import Snackbar from 'react-native-snackbar';
 import * as yup from 'yup';
 

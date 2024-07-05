@@ -1,3 +1,5 @@
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeftIcon,
@@ -8,93 +10,115 @@ import {
   UtensilsIcon,
   XIcon,
 } from 'lucide-react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList } from 'react-native';
-import { useSetAtom } from 'jotai';
+import Snackbar from 'react-native-snackbar';
 
-import { Box, TouchableOpacity } from '@src/atoms';
+import { ActivityIndicator, Box, Text, TouchableOpacity } from '@src/atoms';
 import Dropdown, { DropdownItemType } from '@src/components/dropdown';
 import Input from '@src/components/input';
 import LucideIcon from '@src/components/lucide-icon';
 import MealItem from '@src/components/meal-item';
-import { logMeal } from '@src/states/logged-meals';
-import { MealTimeT } from '@src/types.type';
 
-const meals = [
-  {
-    id: 1,
-    name: 'Pizza',
-    cals: 180,
-    serving: { quantity: 2, unit: 'Slice' },
-    from: 'Pizza Pizza',
-  },
-  {
-    id: 2,
-    name: 'Apple',
-    cals: 50,
-    serving: { quantity: 1, unit: 'Whole' },
-    from: '',
-  },
-  {
-    id: 3,
-    name: 'Coffee',
-    cals: 90,
-    serving: { quantity: 1, unit: 'Cup' },
-    from: 'Homemade',
-  },
-  {
-    id: 4,
-    name: 'Fried Noodles',
-    cals: 375,
-    serving: { quantity: 500, unit: 'Gms' },
-    from: 'Ramyeon Shop',
-  },
-  {
-    id: 5,
-    name: 'Momos',
-    cals: 285,
-    serving: { quantity: 8, unit: 'Pieces' },
-    from: 'Momos Bar',
-  },
-];
+import { useAuth } from '@src/context/auth';
+import { createMealLog } from '@src/firebase';
+import type { GetFoodsResponse, MealTimeT } from '@src/types.type';
+
+const getFoods = async ({
+  limit = 20,
+  page = 1,
+}: {
+  limit?: number;
+  page?: number;
+}): Promise<GetFoodsResponse> => {
+  const FOODS_API_URL = new URL('https://api.nal.usda.gov/fdc/v1/foods/list');
+  FOODS_API_URL.searchParams.set('api_key', 'DEMO_KEY');
+  FOODS_API_URL.searchParams.set('pageSize', String(limit));
+  FOODS_API_URL.searchParams.set('pageNumber', String(page));
+  FOODS_API_URL.searchParams.set(
+    'dataType',
+    ['Branded', 'Foundation', 'Survey (FNDDS)', 'SR Legacy']
+      .map(item => encodeURIComponent(item))
+      .join(',')
+  );
+  // FOODS_API_URL.searchParams.set('sortBy', 'lowercaseDescription.keyword');
+  FOODS_API_URL.searchParams.set('sortOrder', 'asc');
+
+  return axios
+    .get(FOODS_API_URL.toString())
+    .then(res => res.data as GetFoodsResponse);
+};
 
 const LogMealScreen = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const searchParams = useLocalSearchParams<{ mealTime?: MealTimeT }>();
-  const addMealLog = useSetAtom(logMeal);
+  const { auth } = useAuth();
+  const LIMIT = React.useRef(20).current;
 
-  const onAddMealPress = ({
-    meal_id,
-    meal_name,
-    number_of_servings,
-    serving_size,
-    logged_for_date,
+  const {
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    data: foodsList,
+  } = useInfiniteQuery({
+    queryKey: ['foods'],
+    queryFn: ({ pageParam }) => getFoods({ limit: LIMIT, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      if (lastPage.length < LIMIT) return null;
+      else return lastPageParam + 1;
+    },
+  });
+
+  const foodsData = React.useMemo(() => {
+    return foodsList?.pages.flat();
+  }, [foodsList]);
+
+  const onAddMealPress = async ({
+    mealId,
+    mealName,
+    cals,
+    carbohydrates,
+    protein,
+    loggedForDate,
   }: {
-    meal_id: string;
-    meal_name: string;
-    number_of_servings: number;
-    serving_size: string;
-    logged_for_date: Date;
+    mealId: string;
+    mealName: string;
+    cals: number;
+    carbohydrates: number;
+    protein: number;
+    loggedForDate: Date;
   }) => {
-    addMealLog({
-      for: logged_for_date,
-      mealTime: searchParams.mealTime ?? 'breakfast',
-      mealItem: {
-        id: 'NEW ID',
-        user_id: 'Saakar GOGIA`s USER ID GOES HERE',
-        meal_id: meal_id,
-        meal_name: meal_name,
-        number_of_servings: number_of_servings,
-        serving_size: serving_size,
-        logged_for_date: logged_for_date,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    });
+    if (!auth) return;
+
+    try {
+      await createMealLog({
+        userId: auth?.id,
+        loggedFor: loggedForDate,
+        mealId: mealId,
+        mealName: mealName,
+        cals: cals,
+        carbohydrates: carbohydrates,
+        protein: protein,
+        mealTime: searchParams.mealTime ?? 'breakfast',
+      });
+    } catch (error) {
+      console.error('Error adding meal log:', error);
+      Snackbar.show({
+        text: 'Something went wrong! Try again later',
+        textColor: '#DA4167',
+        backgroundColor: '#212529',
+      });
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (hasNextPage) fetchNextPage();
   };
 
   return (
-    <Box flex={1} bg='$background' p='md'>
+    <Box flex={1} bg='$background'>
       <Stack.Screen
         options={{
           headerShown: true,
@@ -146,7 +170,7 @@ const LogMealScreen = () => {
                   <Box overflow='hidden' borderRadius='full'>
                     <TouchableOpacity
                       onPress={() => router.back()}
-                      rippleColor='$background'
+                      rippleColor='black700'
                       width={36}
                       height={36}
                       borderRadius='full'
@@ -178,7 +202,7 @@ const LogMealScreen = () => {
         }}
       />
 
-      <Box mt='sm' mb='md'>
+      <Box p='md' mt='sm' mb='md'>
         <Input px='md'>
           <Input.Icon
             Icon={SearchIcon}
@@ -209,13 +233,82 @@ const LogMealScreen = () => {
         </Input>
       </Box>
 
-      <FlatList
-        contentContainerStyle={{ gap: 8 }}
-        data={meals}
-        renderItem={({ item }) => (
-          <MealItem {...item} onAddPress={onAddMealPress} />
-        )}
-      />
+      {isLoading ? (
+        <Box
+          minHeight={300}
+          alignItems='center'
+          justifyContent='center'
+          gap='sm'
+        >
+          <ActivityIndicator size='large' color='pink' marginTop='md' />
+          <Text
+            color='pink'
+            fontWeight='500'
+            fontFamily='WorkSans_500Medium'
+            fontSize={14}
+            marginBottom='md'
+          >
+            Loading...
+          </Text>
+        </Box>
+      ) : (
+        foodsData && (
+          <FlatList
+            style={{ paddingHorizontal: 12 }}
+            contentContainerStyle={{ gap: 8 }}
+            data={foodsData}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.4}
+            renderItem={({ item }) => (
+              <MealItem
+                id={String(item.fdcId)}
+                name={item.description}
+                cals={
+                  item.foodNutrients.find(i => i.name.startsWith('Energy'))
+                    ?.amount ?? 0
+                }
+                carbohydrates={
+                  item.foodNutrients.find(i =>
+                    i.name.startsWith('Carbohydrate')
+                  )?.amount ?? 0
+                }
+                protein={
+                  item.foodNutrients.find(i => i.name.startsWith('Protein'))
+                    ?.amount ?? 0
+                }
+                onAddPress={onAddMealPress}
+              />
+            )}
+            ListFooterComponent={
+              <Box
+                minHeight={24}
+                alignItems='center'
+                justifyContent='center'
+                gap='sm'
+              >
+                {isFetchingNextPage && (
+                  <React.Fragment>
+                    <ActivityIndicator
+                      size='large'
+                      color='pink'
+                      marginTop='md'
+                    />
+                    <Text
+                      color='pink'
+                      fontWeight='500'
+                      fontFamily='WorkSans_500Medium'
+                      fontSize={14}
+                      marginBottom='md'
+                    >
+                      Loading...
+                    </Text>
+                  </React.Fragment>
+                )}
+              </Box>
+            }
+          />
+        )
+      )}
     </Box>
   );
 };

@@ -1,8 +1,8 @@
-import { FC } from 'react';
-import { LucideIcon as LucideIconRN } from 'lucide-react-native';
 import { Link, usePathname } from 'expo-router';
+import { LucideIcon as LucideIconRN } from 'lucide-react-native';
+import React, { FC } from 'react';
 
-import { Box, Text, Pressable } from '@src/atoms';
+import { Box, Pressable, Text } from '@src/atoms';
 import LucideIcon from './lucide-icon';
 
 type BottomBarButtonProps = {

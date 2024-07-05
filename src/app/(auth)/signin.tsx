@@ -10,7 +10,7 @@ import {
   LogInIcon,
   RectangleEllipsisIcon,
 } from 'lucide-react-native';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import Snackbar from 'react-native-snackbar';
 import * as yup from 'yup';
 
@@ -223,8 +223,6 @@ const SigninScreen = () => {
             </Text>
           </Link>
         </Text>
-
-        <Link href={'/'}>TO Home Page</Link>
       </Box>
     </Fragment>
   );

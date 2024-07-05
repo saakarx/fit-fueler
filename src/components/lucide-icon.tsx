@@ -1,21 +1,19 @@
 import {
-  SpacingProps,
-  SpacingShorthandProps,
-  BorderProps,
   BackgroundColorProps,
   BackgroundColorShorthandProps,
-  ColorProps,
-  TypographyProps,
+  BorderProps,
   LayoutProps,
-  composeRestyleFunctions,
-  color,
-  spacing,
-  spacingShorthand,
-  border,
+  SpacingProps,
+  SpacingShorthandProps,
+  TypographyProps,
   backgroundColor,
   backgroundColorShorthand,
-  typography,
+  border,
+  composeRestyleFunctions,
   layout,
+  spacing,
+  spacingShorthand,
+  typography,
   useRestyle,
   useTheme,
 } from '@shopify/restyle';
@@ -32,12 +30,10 @@ type RestyleProps = SpacingProps<Theme> &
   BorderProps<Theme> &
   BackgroundColorProps<Theme> &
   BackgroundColorShorthandProps<Theme> &
-  ColorProps<Theme> &
   TypographyProps<Theme> &
   LayoutProps<Theme>;
 
 const restyleFunctions = composeRestyleFunctions<Theme, RestyleProps>([
-  color,
   spacing,
   spacingShorthand,
   border,
@@ -56,6 +52,7 @@ export type LucideIconProps = Omit<LucidePropsRN, 'stroke'> &
 const LucideIcon: React.FC<LucideIconProps> = ({
   Icon,
   stroke = '$foreground',
+  color,
   ...rest
 }) => {
   const props = useRestyle(restyleFunctions, rest);
@@ -63,7 +60,7 @@ const LucideIcon: React.FC<LucideIconProps> = ({
 
   const strokeColorValue = theme.colors[stroke];
 
-  return <Icon stroke={strokeColorValue} {...props} />;
+  return <Icon stroke={strokeColorValue} color={color} {...props} />;
 };
 
 export default LucideIcon;

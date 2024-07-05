@@ -25,7 +25,6 @@ type DropdownProps = {
 };
 
 type DropdownItemProps = DropdownItemType & {
-  isLast: boolean;
   activeMealTime: string;
   closeDropdown: () => void;
 };
@@ -106,12 +105,17 @@ const Dropdown: React.FC<DropdownProps> & DropdownComposition = ({
             mx='sm'
             p='sm'
             borderRadius='md'
+            gap='xs'
+            shadowColor='black700'
+            shadowOpacity={0.9}
+            shadowOffset={{ width: 0, height: 4 }}
+            shadowRadius={12}
+            elevation={12}
             onTouchStart={e => e.stopPropagation()}
           >
             {items.map((props, idx) =>
               renderDropdownItem({
                 ...props,
-                isLast: idx === items.length - 1,
                 activeMealTime: activeMealTime,
                 closeDropdown: () => toggleDropdown(false),
               })
@@ -128,13 +132,13 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
   activeMealTime,
   icon,
   id,
-  isLast,
   text,
   closeDropdown,
 }) => (
   <Fragment>
     <Box overflow='hidden' borderRadius='sm'>
       <TouchableOpacity
+        rippleColor='black500'
         borderRadius='sm'
         px='md'
         py='sm'
@@ -159,16 +163,6 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
         )}
       </TouchableOpacity>
     </Box>
-
-    {!isLast && (
-      <Box
-        width='95%'
-        borderBottomWidth={1}
-        borderColor='black700'
-        my='xxs'
-        style={{ marginHorizontal: 'auto' }}
-      />
-    )}
   </Fragment>
 );
 

@@ -1,4 +1,5 @@
 import { BoxProps } from '@shopify/restyle';
+import React from 'react';
 
 import { Box } from '@src/atoms';
 import { Theme } from '@src/themes';

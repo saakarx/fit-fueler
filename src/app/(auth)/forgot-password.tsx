@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { AtSignIcon, SendIcon } from 'lucide-react-native';
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 
 import { Box, Text, TouchableOpacity } from '@src/atoms';
 import Input from '@src/components/input';

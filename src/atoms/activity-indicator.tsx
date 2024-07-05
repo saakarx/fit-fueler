@@ -1,23 +1,23 @@
 import {
-  ActivityIndicator as RNActivityIndicator,
-  ActivityIndicatorProps as RNActivityIndicatorProps,
-} from 'react-native';
-import {
   BackgroundColorProps,
+  LayoutProps,
   OpacityProps,
   PositionProps,
   SpacingProps,
-  LayoutProps,
   backgroundColor,
+  composeRestyleFunctions,
+  layout,
   opacity,
   position,
   spacing,
-  layout,
   useRestyle,
   useTheme,
-  composeRestyleFunctions,
 } from '@shopify/restyle';
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
+import {
+  ActivityIndicator as RNActivityIndicator,
+  ActivityIndicatorProps as RNActivityIndicatorProps,
+} from 'react-native';
 
 import { Theme } from '@src/themes';
 
