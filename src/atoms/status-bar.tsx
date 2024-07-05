@@ -1,5 +1,7 @@
 import { useTheme } from '@shopify/restyle';
+import React from 'react';
 import { StatusBar as NativeStatusBar } from 'react-native';
+
 import { Theme } from '../themes';
 
 const StatusBar = () => {

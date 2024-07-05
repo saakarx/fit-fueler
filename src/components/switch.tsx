@@ -1,20 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable } from 'react-native';
 
-const Switch = () => {
-  const [notifsEnabled, setNotifsEnabled] = useState<boolean>(false);
-  const animatedValue = useRef(
-    new Animated.Value(notifsEnabled ? 1 : 0)
-  ).current;
+const Switch = ({
+  value,
+  onChange,
+}: {
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) => {
+  const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
 
   useEffect(() => {
     Animated.timing(animatedValue, {
-      toValue: notifsEnabled ? 1 : 0,
+      toValue: value ? 1 : 0,
       duration: 150,
       useNativeDriver: true,
       easing: Easing.elastic(1),
     }).start();
-  }, [notifsEnabled]);
+  }, [value]);
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -23,14 +26,14 @@ const Switch = () => {
 
   return (
     <Pressable
-      onPress={() => setNotifsEnabled(prevVal => !prevVal)}
+      onPress={() => onChange(!value)}
       style={{
         width: 40,
 
         padding: 4,
 
         borderRadius: 99999,
-        backgroundColor: notifsEnabled ? '#96E6B3' : '#8E9AAF',
+        backgroundColor: value ? '#96E6B3' : '#8E9AAF',
         alignItems: 'center',
         flexDirection: 'row',
 

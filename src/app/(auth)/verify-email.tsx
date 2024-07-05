@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { MailCheckIcon } from 'lucide-react-native';
-import { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import {
   NativeSyntheticEvent,
   TextInput as NativeTextInput,

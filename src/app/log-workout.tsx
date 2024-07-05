@@ -1,55 +1,110 @@
-import {
-  BottomSheetBackdrop,
-  BottomSheetTextInput,
-  BottomSheetView,
-  BottomSheetModal as RNBottomSheetModal,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal as RNBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { router, Stack } from 'expo-router';
-import { useSetAtom } from 'jotai';
 import {
   ArrowLeftIcon,
   ChevronRightIcon,
-  PlusIcon,
   SearchIcon,
   XIcon,
 } from 'lucide-react-native';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { FlatList } from 'react-native';
 
-import { Box, Text, TouchableOpacity } from '@src/atoms';
-import { BottomSheetModal } from '@src/atoms/bottom-sheet';
+import { ActivityIndicator, Box, Text, TouchableOpacity } from '@src/atoms';
+import CreateWorkoutLogBottomSheet from '@src/components/create-workout-log-bottom-sheet';
 import Input from '@src/components/input';
 import LucideIcon from '@src/components/lucide-icon';
 
-import { addWorkoutLog } from '@src/states/log-workouts';
+import { GetWorkoutsResponse } from '@src/types.type';
 
-const exercises = [
-  { id: '1', name: 'Abdominal Crunches' },
-  { id: '2', name: 'Abdominal Leg Raise' },
-  { id: '3', name: 'Abdominal Twist, Seated, Machine' },
-  { id: '4', name: 'Back Butterfly' },
-  { id: '5', name: 'Back Extension' },
-  { id: '6', name: 'Bar Dip, Palms in, Neutral Grip' },
-  { id: '7', name: 'Barbell Military Press' },
-  { id: '8', name: 'Barbell Row, Bent Over' },
-  { id: '9', name: 'Bench (Chest) Press, Machine' },
-];
+const getExercises = ({
+  limit = 20,
+  page = 1,
+}: {
+  limit?: number;
+  page?: number;
+}): Promise<GetWorkoutsResponse> => {
+  const EXERCISES_API_URL = new URL('https://wger.de/api/v2/exercisebaseinfo');
+  EXERCISES_API_URL.searchParams.set('ordering', 'id');
+  EXERCISES_API_URL.searchParams.set('limit', String(limit));
+  EXERCISES_API_URL.searchParams.set('offset', String((page - 1) * limit));
+
+  return axios.get(EXERCISES_API_URL.toString()).then(res => res.data);
+};
 
 const LogWorkoutScreen = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [deferredSearchTerm, setDeferredSearchTerm] = useState<string>('');
   const [activeExercise, setActiveExercise] = useState<{
     id: string;
     name: string;
   } | null>(null);
   const bottomSheetRef = useRef<RNBottomSheetModal>(null);
-  const addWorkoutLogItem = useSetAtom(addWorkoutLog);
+  const limit = useRef(20).current;
+  const timer = useRef<NodeJS.Timeout>();
+
+  const {
+    isLoading,
+    data: exercisesData,
+    isError,
+    error,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['exercises'],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => {
+      return getExercises({ limit, page: pageParam });
+    },
+    getNextPageParam: lastPage => {
+      const url = new URL(lastPage.next ?? '');
+      const searchParams = new URLSearchParams(url.search);
+      const offset = Number(searchParams.get('offset') ?? 0);
+
+      return lastPage.next !== null ? offset / limit + 1 : null;
+    },
+  });
+
+  React.useEffect(() => {
+    timer.current = setTimeout(() => {
+      setDeferredSearchTerm(searchTerm);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer.current);
+    };
+  }, [searchTerm]);
 
   const handleOpenBottomSheet = () => {
     const { current: bottomSheet } = bottomSheetRef;
     if (bottomSheet) bottomSheet.present();
   };
 
+  const handleCloseBottomSheet = () => {
+    const { current: bottomSheet } = bottomSheetRef;
+    if (bottomSheet) bottomSheet.forceClose();
+
+    setActiveExercise(null);
+  };
+
+  const handleLoadMore = () => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  if (isError) console.error(error);
+
+  const exerciseResults = React.useMemo(() => {
+    const result = exercisesData?.pages.flatMap(page => page.results);
+
+    return result;
+  }, [exercisesData]);
+
   return (
-    <Box flex={1} bg='$background' p='md'>
+    <Box flex={1} bg='$background'>
       <Stack.Screen
         options={{
           headerShown: true,
@@ -69,7 +124,7 @@ const LogWorkoutScreen = () => {
                   <Box overflow='hidden' borderRadius='full'>
                     <TouchableOpacity
                       onPress={() => router.back()}
-                      rippleColor='$background'
+                      rippleColor='black700'
                       width={36}
                       height={36}
                       borderRadius='full'
@@ -86,7 +141,7 @@ const LogWorkoutScreen = () => {
         }}
       />
 
-      <Box mb='md'>
+      <Box pt='md' px='md' mb='md'>
         <Input px='md'>
           <Input.Icon
             Icon={SearchIcon}
@@ -117,173 +172,142 @@ const LogWorkoutScreen = () => {
         </Input>
       </Box>
 
-      <Box gap='sm'>
-        {exercises.map(exercise => (
-          <Box key={exercise.id} borderRadius='md' overflow='hidden'>
-            <TouchableOpacity
-              onPress={() => {
-                setActiveExercise({ id: exercise.id, name: exercise.name });
-                handleOpenBottomSheet();
-              }}
-              bg='black700'
-              rippleColor='black700'
-              p='md'
-              borderRadius='md'
-              flexDirection='row'
-              alignItems='center'
-              justifyContent='space-between'
-            >
-              <Text>{exercise.name}</Text>
-              <LucideIcon
-                Icon={ChevronRightIcon}
-                stroke='black300'
-                strokeWidth={1.5}
-                size={20}
-              />
-            </TouchableOpacity>
-          </Box>
-        ))}
-      </Box>
-
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        index={1}
-        backdropComponent={props => (
-          <BottomSheetBackdrop
-            {...props}
-            disappearsOnIndex={-1}
-            appearsOnIndex={0}
-          />
-        )}
-        enablePanDownToClose={true}
-        snapPoints={['40%', '80%']}
-        detached={true}
-        topInset={12}
-        bottomInset={12}
-        keyboardBehavior='fillParent'
-        keyboardBlurBehavior='restore'
-        onDismiss={() => setActiveExercise(null)}
-        style={{ marginHorizontal: 12 }}
-      >
-        <BottomSheetView style={{ flex: 1, padding: 12 }}>
+      {isLoading ? (
+        <Box
+          my='md'
+          minHeight={300}
+          alignItems='center'
+          justifyContent='center'
+        >
+          <ActivityIndicator size='large' color='pink' />
           <Text
-            fontSize={24}
-            fontWeight='600'
-            fontFamily='WorkSans_600SemiBold'
-            mb='lg'
-          >
-            {`Log Workout › \n\n`}
-            {activeExercise && activeExercise.name}
-          </Text>
-
-          <Text
-            color='$fieldInputPlaceholderTextColor'
-            fontSize={15}
-            fontWeight='500'
+            color='pink'
             fontFamily='WorkSans_500Medium'
-            mb='xs'
-          >
-            Number of Sets
-          </Text>
-          <BottomSheetTextInput
-            placeholder='Required'
-            style={{
-              borderRadius: 12,
-              paddingVertical: 8,
-              paddingHorizontal: 16,
-              color: 'white',
-              borderWidth: 1,
-              borderColor: '#888',
-            }}
-            placeholderTextColor='#777'
-            cursorColor='white'
-          />
-
-          <Text
-            color='$fieldInputPlaceholderTextColor'
-            fontSize={15}
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
-            mt='sm'
-            mb='xs'
+            fontSize={14}
           >
-            Repetions / Set
+            Loading...
           </Text>
-          <BottomSheetTextInput
-            placeholder='Required'
-            style={{
-              borderRadius: 12,
-              paddingVertical: 8,
-              paddingHorizontal: 16,
-              color: 'white',
-              borderWidth: 1,
-              borderColor: '#888',
+        </Box>
+      ) : (
+        exercisesData && (
+          <FlatList
+            data={exerciseResults}
+            style={{ paddingHorizontal: 12 }}
+            contentContainerStyle={{ gap: 6 }}
+            renderItem={({ item }) => {
+              const exercise = item.exercises.find(
+                exercise => exercise.language === 2
+              );
+              if (!exercise) return null;
+
+              return (
+                <Box key={exercise.id} borderRadius='md' overflow='hidden'>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveExercise({
+                        id: String(exercise.id),
+                        name: exercise.name,
+                      });
+                      handleOpenBottomSheet();
+                    }}
+                    bg='black700'
+                    rippleColor='black700'
+                    p='md'
+                    borderRadius='md'
+                    flexDirection='row'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Text>{exercise.name}</Text>
+                    <LucideIcon
+                      Icon={ChevronRightIcon}
+                      stroke='black300'
+                      strokeWidth={1.5}
+                      size={20}
+                    />
+                  </TouchableOpacity>
+                </Box>
+              );
             }}
-            placeholderTextColor='#777'
-            cursorColor='white'
-          />
-
-          <Text
-            color='$fieldInputPlaceholderTextColor'
-            fontSize={15}
-            fontWeight='500'
-            fontFamily='WorkSans_500Medium'
-            mt='sm'
-            mb='xs'
-          >
-            Weight per Repetition
-          </Text>
-          <BottomSheetTextInput
-            placeholder='Optional'
-            style={{
-              borderRadius: 12,
-              paddingVertical: 8,
-              paddingHorizontal: 16,
-              color: 'white',
-              borderWidth: 1,
-              borderColor: '#888',
-            }}
-            placeholderTextColor='#777'
-            cursorColor='white'
-          />
-
-          <Box mt='lg' borderRadius='sm' overflow='hidden'>
-            <TouchableOpacity
-              bg='pink'
-              rippleColor='pink'
-              minHeight={42}
-              p='sm'
-              borderRadius='sm'
-              alignItems='center'
-              justifyContent='center'
-              flexDirection='row'
-              gap='sm'
-              onPress={() => {
-                if (!activeExercise) return;
-
-                addWorkoutLogItem({
-                  name: activeExercise.name,
-                  reps: 8,
-                  sets: 2,
-                  weight: 0,
-                  logged_for: new Date(),
-                });
-              }}
-            >
-              <Text
-                color='black900'
-                fontSize={15}
-                lineHeight={17}
-                fontWeight='500'
-                fontFamily='WorkSans_500Medium'
+            keyExtractor={item => item.uuid}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.2}
+            ListFooterComponent={
+              <Box
+                minHeight={24}
+                alignItems='center'
+                justifyContent='center'
+                gap='sm'
               >
-                Log Workout
-              </Text>
-              <LucideIcon Icon={PlusIcon} stroke='black900' size={20} />
-            </TouchableOpacity>
-          </Box>
-        </BottomSheetView>
-      </BottomSheetModal>
+                {isFetchingNextPage && (
+                  <React.Fragment>
+                    <ActivityIndicator
+                      size='large'
+                      color='pink'
+                      marginTop='md'
+                    />
+                    <Text
+                      color='pink'
+                      fontWeight='500'
+                      fontFamily='WorkSans_500Medium'
+                      fontSize={14}
+                      marginBottom='md'
+                    >
+                      Loading...
+                    </Text>
+                  </React.Fragment>
+                )}
+              </Box>
+            }
+          />
+        )
+      )}
+
+      {/* <Box gap='sm'>
+          {isLoading && <ActivityIndicator size='large' color='pink' />}
+          {exercisesData?.results.map(result => {
+            const exercise = result.exercises.find(
+              exercise => exercise.language === 2
+            );
+            if (!exercise) return null;
+
+            return (
+              <Box key={exercise.id} borderRadius='md' overflow='hidden'>
+                <TouchableOpacity
+                  onPress={() => {
+                    setActiveExercise({
+                      id: String(exercise.id),
+                      name: exercise.name,
+                    });
+                    handleOpenBottomSheet();
+                  }}
+                  bg='black700'
+                  rippleColor='black700'
+                  p='md'
+                  borderRadius='md'
+                  flexDirection='row'
+                  alignItems='center'
+                  justifyContent='space-between'
+                >
+                  <Text>{exercise.name}</Text>
+                  <LucideIcon
+                    Icon={ChevronRightIcon}
+                    stroke='black300'
+                    strokeWidth={1.5}
+                    size={20}
+                  />
+                </TouchableOpacity>
+              </Box>
+            );
+          })}
+        </Box> */}
+
+      <CreateWorkoutLogBottomSheet
+        ref={bottomSheetRef}
+        activeExercise={activeExercise}
+        closeModal={handleCloseBottomSheet}
+      />
     </Box>
   );
 };

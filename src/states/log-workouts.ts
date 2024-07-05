@@ -1,46 +1,42 @@
 import { atom } from 'jotai';
 
-type WorkoutLog = {
+import { type WorkoutLog } from '@src/firebase';
+
+type WorkoutLogAdd = WorkoutLog;
+
+export const loggedWorkoutsAtom = atom<WorkoutLog[]>([]);
+
+export const addWorkoutLogAtom = atom(
+  null,
+  (get, set, update: WorkoutLogAdd) => {
+    set(loggedWorkoutsAtom, prevValue => {
+      const newWorkouts = [...prevValue];
+      newWorkouts.push(update);
+      return newWorkouts;
+    });
+  }
+);
+
+export const updateLoggedWorkoutsAtom = atom(
+  null,
+  (_get, set, update: WorkoutLog[]) => {
+    set(loggedWorkoutsAtom, prevValue => [...prevValue, ...update]);
+  }
+);
+
+type RemoveWorkoutLogT = {
   id: string;
-  name: string;
-  sets: number;
-  reps: number;
-  weight: number;
-  logged_for: Date;
-  created_at: Date;
-  updated_at: Date;
+  loggedFor: string;
 };
 
-type WorkoutLogAdd = Omit<WorkoutLog, 'id' | 'created_at' | 'updated_at'>;
-
-export const loggedWorkouts = atom<WorkoutLog[]>([]);
-
-export const addWorkoutLog = atom(null, (get, set, update: WorkoutLogAdd) => {
-  set(loggedWorkouts, prevValue => {
-    const newWorkouts = [...prevValue];
-    const logItem: WorkoutLog = {
-      id: 'WORKOUT_ID_' + get(loggedWorkouts).length + 1,
-      ...update,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-
-    newWorkouts.push(logItem);
-    return newWorkouts;
-  });
-});
-
-export const removeWorkoutLog = atom(
+export const removeWorkoutLogAtom = atom(
   null,
-  (_get, set, update: { id: string; logged_for: Date }) => {
-    set(loggedWorkouts, prevValue => {
+  (_get, set, update: RemoveWorkoutLogT) => {
+    set(loggedWorkoutsAtom, prevValue => {
       const newWorkouts = [...prevValue];
-
       const workoutIdx = newWorkouts.findIndex(
         workout =>
-          workout.id === update.id &&
-          workout.logged_for.toLocaleDateString() ===
-            update.logged_for.toLocaleDateString()
+          workout.id === update.id && workout.loggedFor === update.loggedFor
       );
 
       if (workoutIdx !== -1) {

@@ -1,29 +1,39 @@
+import React, { useState } from 'react';
 import { PlusIcon } from 'lucide-react-native';
 
-import { Box, Text, TouchableOpacity } from '@src/atoms';
+import { ActivityIndicator, Box, Text, TouchableOpacity } from '@src/atoms';
 import LucideIcon from './lucide-icon';
 
 type MealItemProps = {
+  id: string;
   name: string;
   cals: number;
-  serving: { quantity: number; unit: string };
-  from: string;
+  carbohydrates: number;
+  protein: number;
   onAddPress: ({
-    meal_id,
-    meal_name,
-    number_of_servings,
-    serving_size,
-    logged_for_date,
+    mealId,
+    mealName,
+    loggedForDate,
   }: {
-    meal_id: string;
-    meal_name: string;
-    number_of_servings: number;
-    serving_size: string;
-    logged_for_date: Date;
-  }) => void;
+    mealId: string;
+    mealName: string;
+    cals: number;
+    carbohydrates: number;
+    protein: number;
+    loggedForDate: Date;
+  }) => Promise<void>;
 };
 
-const MealItem = ({ name, cals, serving, from, onAddPress }: MealItemProps) => {
+const MealItem = ({
+  id,
+  name,
+  cals,
+  carbohydrates,
+  protein,
+  onAddPress,
+}: MealItemProps) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   return (
     <Box
       flexDirection='row'
@@ -42,17 +52,15 @@ const MealItem = ({ name, cals, serving, from, onAddPress }: MealItemProps) => {
           fontFamily='WorkSans_500Medium'
           color='purple'
         >
-          {name}
+          {name.trim()}
         </Text>
 
         <Text fontSize={15} color='$fieldInputPlaceholderTextColor'>
-          {cals} cal, {serving.quantity}
-          {serving.unit && ` ${serving.unit}`}
-          {from && `, ${from}`}
+          {cals} KCAL, {protein} G (Protein), {carbohydrates} G (Carbs)
         </Text>
       </Box>
 
-      <Box overflow='hidden' borderRadius='full'>
+      <Box overflow='hidden' borderRadius='full' opacity={isLoading ? 0.5 : 1}>
         <TouchableOpacity
           bg='black300'
           p='xxs'
@@ -62,17 +70,25 @@ const MealItem = ({ name, cals, serving, from, onAddPress }: MealItemProps) => {
           alignItems='center'
           justifyContent='center'
           rippleColor='black300'
-          onPress={() =>
-            onAddPress({
-              meal_id: 'MEAL_ID GOES HERE',
-              meal_name: name,
-              number_of_servings: serving.quantity,
-              serving_size: serving.unit,
-              logged_for_date: new Date(),
-            })
-          }
+          disabled={isLoading}
+          onPress={async () => {
+            setIsLoading(true);
+            await onAddPress({
+              mealId: id,
+              mealName: name,
+              cals: cals,
+              carbohydrates: carbohydrates,
+              protein: protein,
+              loggedForDate: new Date(),
+            });
+            setIsLoading(false);
+          }}
         >
-          <LucideIcon Icon={PlusIcon} size={25} stroke='purple' />
+          {isLoading ? (
+            <ActivityIndicator color='purple' />
+          ) : (
+            <LucideIcon Icon={PlusIcon} size={25} stroke='purple' />
+          )}
         </TouchableOpacity>
       </Box>
     </Box>

@@ -1,13 +1,14 @@
 import { useAtom } from 'jotai';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react-native';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Box, Text, TouchableOpacity } from '@src/atoms';
+import LucideIcon from './lucide-icon';
+
 import { activeThemeId } from '@src/states/theme';
 import { ThemeNames, themes } from '@src/themes';
-import LucideIcon from './lucide-icon';
 
 const ChangeTheme = () => {
   const [dimens, setDimens] = useState<{ x: number; y: number }>({
@@ -111,6 +112,7 @@ const ChangeThemeDropdown = ({ fromTop = 0 }: { fromTop?: number }) => {
             left={0}
             right={0}
             p='xs'
+            mx='md'
             borderRadius='md'
             onTouchStart={e => e.stopPropagation()}
           >

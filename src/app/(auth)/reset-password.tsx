@@ -5,7 +5,7 @@ import {
   KeyIcon,
   RectangleEllipsisIcon,
 } from 'lucide-react-native';
-import { Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { Box, Pressable, Text, TouchableOpacity } from '@src/atoms';
 import Input from '@src/components/input';
