@@ -37,8 +37,14 @@ import useGetMealsWithSS from '@src/hooks/useGetMealsWithSS';
 import useGetWaterWithSS from '@src/hooks/useGetWaterWithSS';
 import useGetWorkoutsWithSS from '@src/hooks/useGetWorkoutsWithSS';
 
-import { type MealLog } from '@src/firebase';
+import {
+  deleteMealLog,
+  deleteWaterLog,
+  deleteWorkoutLog,
+  type MealLog,
+} from '@src/firebase';
 import type { MealTimeT } from '@src/types.type';
+import Snackbar from 'react-native-snackbar';
 
 const getDaysList = (curDate: Date = new Date()) => {
   const twoDaysPrev = subDays(curDate, 2);
@@ -159,6 +165,24 @@ const WorkoutLogs = ({ selectedDate }: { selectedDate: Date }) => {
     error: workoutsError,
   } = useGetWorkoutsWithSS(auth?.id ?? '', selectedDate);
 
+  const removeLog = async ({
+    id,
+    loggedFor,
+  }: {
+    id: string;
+    loggedFor: string;
+  }) => {
+    try {
+      await deleteWorkoutLog(id, auth?.id ?? '', loggedFor);
+    } catch (error) {
+      Snackbar.show({
+        text: 'Something went wrong! Try again later',
+        backgroundColor: '#212529',
+        textColor: '#DA4167',
+      });
+    }
+  };
+
   return (
     <LogsList
       isLoading={isWorkoutsLoading}
@@ -171,7 +195,7 @@ const WorkoutLogs = ({ selectedDate }: { selectedDate: Date }) => {
         <WorkoutLogItem
           key={workout.id}
           workout={workout}
-          removeWorkoutLogItem={() => {}} // FIXME:
+          removeWorkoutLogItem={removeLog}
         />
       ))}
     </LogsList>
@@ -210,6 +234,24 @@ const MealLogs = ({ selectedDate }: { selectedDate: Date }) => {
       snacks: MealLog[];
     };
   }, [mealsLogs]);
+
+  const removeLog = async ({
+    id,
+    loggedFor,
+  }: {
+    id: string;
+    loggedFor: string;
+  }) => {
+    try {
+      await deleteMealLog(id, auth?.id ?? '', loggedFor);
+    } catch (error) {
+      Snackbar.show({
+        text: 'Something went wrong! Try again later',
+        backgroundColor: '#212529',
+        textColor: '#DA4167',
+      });
+    }
+  };
 
   if (isMealsLoading)
     return (
@@ -280,7 +322,7 @@ const MealLogs = ({ selectedDate }: { selectedDate: Date }) => {
                   meal.id
                 }_${mealIdx}`}
                 meal={meal}
-                removeMealLogItem={() => {}}
+                removeMealLogItem={removeLog}
               />
             ))}
           </Fragment>
@@ -299,6 +341,24 @@ const WaterLogs = ({ selectedDate }: { selectedDate: Date }) => {
     error: waterError,
   } = useGetWaterWithSS(auth?.id ?? '', selectedDate);
 
+  const removeLog = async ({
+    id,
+    loggedFor,
+  }: {
+    id: string;
+    loggedFor: string;
+  }) => {
+    try {
+      await deleteWaterLog(id, auth?.id ?? '', loggedFor);
+    } catch (error) {
+      Snackbar.show({
+        text: 'Something went wrong! Try again later',
+        backgroundColor: '#212529',
+        textColor: '#DA4167',
+      });
+    }
+  };
+
   return (
     <LogsList
       isLoading={isWaterLoading}
@@ -312,7 +372,7 @@ const WaterLogs = ({ selectedDate }: { selectedDate: Date }) => {
           <WaterLogItem
             key={water.id}
             water={water}
-            removeWaterLogItem={() => {}}
+            removeWaterLogItem={removeLog}
           />
         );
       })}
