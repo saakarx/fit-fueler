@@ -51,25 +51,26 @@ const AddWorkoutButton = () => {
           justifyContent='center'
           flexDirection='row'
           gap='md'
-          rippleColor='black700'
+          backgroundColor='$addButtonBg'
+          rippleColor='$addButtonRippleColor'
           px='lg'
           py='sm'
           minHeight={36}
           borderWidth={1}
-          borderColor='black500'
+          borderColor='$addButtonBorder'
           borderRadius='md'
         >
           <LucideIcon
             Icon={DumbbellIcon}
             strokeWidth={2}
             size={20}
-            stroke='lightBlue'
+            stroke='$addWorkoutButtonTextColor'
           />
           <Text
             fontWeight='500'
             fontFamily='WorkSans_500Medium'
             textAlign='center'
-            color='lightBlue'
+            color='$addWorkoutButtonTextColor'
           >
             Add Exercise
           </Text>
@@ -97,22 +98,28 @@ const AddMealButton = ({
         <TouchableOpacity
           flexDirection='row'
           gap='md'
-          rippleColor='black700'
+          backgroundColor='$addButtonBg'
+          rippleColor='$addButtonRippleColor'
           px='lg'
           py='sm'
           minHeight={36}
           alignItems='center'
           justifyContent='center'
           borderWidth={1}
-          borderColor='black500'
+          borderColor='$addButtonBorder'
           borderRadius='md'
         >
-          <LucideIcon Icon={icon} strokeWidth={2} size={20} stroke='yellow' />
+          <LucideIcon
+            Icon={icon}
+            strokeWidth={2}
+            size={20}
+            stroke='$addMealButtonTextColor'
+          />
           <Text
             fontWeight='500'
             fontFamily='WorkSans_500Medium'
             textAlign='center'
-            color='yellow'
+            color='$addMealButtonTextColor'
           >
             Add {text}
           </Text>
@@ -133,19 +140,19 @@ const AddWaterButton = ({ openSheet }: { openSheet: () => void }) => {
         minHeight={36}
         py='sm'
         px='lg'
-        backgroundColor='$background'
-        rippleColor='black700'
+        backgroundColor='$addButtonBg'
+        rippleColor='$addButtonRippleColor'
         borderWidth={1}
-        borderColor='black500'
+        borderColor='$addButtonBorder'
         borderRadius='md'
         onPress={() => openSheet()}
       >
-        <LucideIcon Icon={GlassWaterIcon} stroke='lightGreen' size={20} />
+        <LucideIcon Icon={GlassWaterIcon} stroke='$addWaterButtonTextColor' size={20} />
         <Text
           fontWeight='500'
           fontFamily='WorkSans_500Medium'
           textAlign='center'
-          color='lightGreen'
+          color='$addWaterButtonTextColor'
         >
           Add Water
         </Text>

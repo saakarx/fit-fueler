@@ -1,13 +1,13 @@
 import { Link } from 'expo-router';
 import { DumbbellIcon, PlusIcon, UtensilsIcon } from 'lucide-react-native';
 import React, { Fragment, useState } from 'react';
-import { Modal, TouchableOpacity } from 'react-native';
+import { Modal } from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { Box, Text } from '@src/atoms';
+import { Box, Text, TouchableOpacity } from '@src/atoms';
 import { useBottomBar } from '@src/context/bottom-bar';
 import LucideIcon from './lucide-icon';
 
@@ -36,25 +36,31 @@ const BottomBarPlusButton = () => {
 
   return (
     <>
-      <TouchableOpacity style={{ flex: 1 }} onPress={() => togglePopover(true)}>
-        <Box
+      <Box flex={1} overflow='hidden' borderRadius='lg'>
+        <TouchableOpacity
+          rippleColor='purple'
           flex={1}
-          alignItems='center'
-          justifyContent='center'
-          bg='purple'
-          borderWidth={1}
-          borderColor='purple'
-          borderRadius='lg'
-          p='xs'
+          onPress={() => togglePopover(true)}
         >
-          <LucideIcon
-            Icon={PlusIcon}
-            size={24}
-            stroke='white'
-            strokeWidth={2}
-          />
-        </Box>
-      </TouchableOpacity>
+          <Box
+            flex={1}
+            alignItems='center'
+            justifyContent='center'
+            bg='purple'
+            borderWidth={1}
+            borderColor='purple'
+            borderRadius='lg'
+            p='xs'
+          >
+            <LucideIcon
+              Icon={PlusIcon}
+              size={24}
+              stroke='white'
+              strokeWidth={2}
+            />
+          </Box>
+        </TouchableOpacity>
+      </Box>
 
       <Modal transparent={true} animationType='fade' visible={visible}>
         <SafeAreaView
@@ -99,27 +105,28 @@ const BottomBarPlusButton = () => {
 
             {popoverItems.map(({ icon, text, href }, idx) => (
               <Fragment key={idx}>
-                <Link href={href} asChild>
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 12,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      borderRadius: 8,
-                    }}
-                    onPress={() => togglePopover(false)}
-                  >
-                    <LucideIcon
-                      Icon={icon}
-                      size={20}
-                      stroke='pink'
-                      strokeWidth={1.5}
-                    />
-                    <Text>{text}</Text>
-                  </TouchableOpacity>
-                </Link>
+                <Box borderRadius='sm' overflow='hidden'>
+                  <Link href={href} asChild>
+                    <TouchableOpacity
+                      rippleColor='$backgroundRippleColor'
+                      flexDirection='row'
+                      alignItems='center'
+                      gap='md'
+                      paddingVertical='sm'
+                      paddingHorizontal='md'
+                      borderRadius='sm'
+                    >
+                      <LucideIcon
+                        Icon={icon}
+                        size={20}
+                        stroke='pink'
+                        strokeWidth={1.5}
+                      />
+                      <Text>{text}</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </Box>
+
                 {idx !== popoverItems.length - 1 && (
                   <Box
                     width='95%'

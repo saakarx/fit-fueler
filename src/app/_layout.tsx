@@ -51,7 +51,7 @@ const Layout = () => {
               <SafeAreaView style={{ flex: 1 }}>
                 <StatusBar />
                 <Stack
-                  initialRouteName='/(auth)/index'
+                  initialRouteName='/(auth)/signin'
                   screenOptions={{ headerShown: false }}
                 />
               </SafeAreaView>

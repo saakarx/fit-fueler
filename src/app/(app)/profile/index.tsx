@@ -138,7 +138,7 @@ const ProfileScreen = () => {
                 borderWidth={1}
                 borderRadius='md'
                 backgroundColor='$background'
-                rippleColor='black700'
+                rippleColor='$backgroundRippleColor'
               >
                 <LucideIcon
                   Icon={PenIcon}

@@ -27,9 +27,9 @@ const AddWaterPill = ({
       <TouchableOpacity
         borderRadius='md'
         bg='$background'
-        rippleColor='$background'
+        rippleColor='$backgroundRippleColor'
         borderWidth={1}
-        borderColor='activeBottomBarLink'
+        borderColor='$bottomBarActiveItem'
         alignItems='center'
         justifyContent='center'
         gap='xs'
@@ -39,13 +39,13 @@ const AddWaterPill = ({
         <LucideIcon
           Icon={GlassWaterIcon}
           size={24}
-          stroke='activeBottomBarLink'
+          stroke='$bottomBarActiveItem'
           strokeWidth={2}
         />
         <Text
           fontFamily='WorkSans_600SemiBold'
           fontWeight='600'
-          color='activeBottomBarLink'
+          color='$bottomBarActiveItem'
         >
           +{quantity} ml
         </Text>

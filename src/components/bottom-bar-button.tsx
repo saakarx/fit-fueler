@@ -25,13 +25,15 @@ const BottomBarButton: FC<BottomBarButtonProps> = ({ icon, text, href }) => {
           gap='xxs'
           borderWidth={1}
           borderRadius='lg'
-          style={{ borderColor: '#6C757D' }}
-          bg={activeRoute ? 'black500' : '$bottomBarBg'}
+          borderColor='$bottomBarItemBorder'
+          bg={
+            activeRoute ? '$bottomBarActiveItemBg' : '$bottomBarInactiveItemBg'
+          }
           p='xs'
         >
           <LucideIcon
             stroke={
-              activeRoute ? 'activeBottomBarLink' : 'inactiveBottomBarLink'
+              activeRoute ? '$bottomBarActiveItem' : '$bottomBarInactiveItem'
             }
             strokeWidth={activeRoute ? 2 : 1}
             Icon={icon}
@@ -39,7 +41,7 @@ const BottomBarButton: FC<BottomBarButtonProps> = ({ icon, text, href }) => {
           />
           {activeRoute && (
             <Text
-              color='activeBottomBarLink'
+              color='$bottomBarActiveItem'
               fontFamily='WorkSans_500Medium'
               fontWeight='500'
               fontSize={11}

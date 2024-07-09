@@ -21,7 +21,7 @@ const WaterLogItem = ({
 }) => {
   return (
     <Box
-      bg='black700'
+      bg='$logItemBg'
       p='sm'
       px='lg'
       borderRadius='md'
@@ -31,15 +31,15 @@ const WaterLogItem = ({
       justifyContent='space-between'
     >
       <Box>
-        <Text fontWeight='500' fontFamily='WorkSans_500Medium'>
+        <Text fontWeight='500' fontFamily='WorkSans_500Medium' color='purple'>
           Water
         </Text>
         <Text color='$fieldInputPlaceholderTextColor'>{water.quantity} ml</Text>
       </Box>
       <Box borderRadius='full' overflow='hidden'>
         <TouchableOpacity
-          bg='black700'
-          rippleColor='black500'
+          bg='$logItemButtonBg'
+          rippleColor='$logItemButtonRippleColor'
           p='sm'
           borderRadius='full'
           onPress={() => {

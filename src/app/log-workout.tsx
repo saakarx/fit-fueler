@@ -124,7 +124,7 @@ const LogWorkoutScreen = () => {
                   <Box overflow='hidden' borderRadius='full'>
                     <TouchableOpacity
                       onPress={() => router.back()}
-                      rippleColor='black700'
+                      rippleColor='$backgroundRippleColor'
                       width={36}
                       height={36}
                       borderRadius='full'
@@ -211,8 +211,8 @@ const LogWorkoutScreen = () => {
                       });
                       handleOpenBottomSheet();
                     }}
-                    bg='black700'
-                    rippleColor='black700'
+                    bg='$logItemBg'
+                    rippleColor='$logItemRippleColor'
                     p='md'
                     borderRadius='md'
                     flexDirection='row'
@@ -263,45 +263,6 @@ const LogWorkoutScreen = () => {
           />
         )
       )}
-
-      {/* <Box gap='sm'>
-          {isLoading && <ActivityIndicator size='large' color='pink' />}
-          {exercisesData?.results.map(result => {
-            const exercise = result.exercises.find(
-              exercise => exercise.language === 2
-            );
-            if (!exercise) return null;
-
-            return (
-              <Box key={exercise.id} borderRadius='md' overflow='hidden'>
-                <TouchableOpacity
-                  onPress={() => {
-                    setActiveExercise({
-                      id: String(exercise.id),
-                      name: exercise.name,
-                    });
-                    handleOpenBottomSheet();
-                  }}
-                  bg='black700'
-                  rippleColor='black700'
-                  p='md'
-                  borderRadius='md'
-                  flexDirection='row'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Text>{exercise.name}</Text>
-                  <LucideIcon
-                    Icon={ChevronRightIcon}
-                    stroke='black300'
-                    strokeWidth={1.5}
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </Box>
-            );
-          })}
-        </Box> */}
 
       <CreateWorkoutLogBottomSheet
         ref={bottomSheetRef}

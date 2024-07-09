@@ -15,7 +15,7 @@ const WorkoutLogItem = ({
 }) => {
   return (
     <Box
-      bg='black700'
+      bg='$logItemBg'
       p='sm'
       px='lg'
       borderRadius='md'
@@ -25,7 +25,7 @@ const WorkoutLogItem = ({
       justifyContent='space-between'
     >
       <Box>
-        <Text fontWeight='500' fontFamily='WorkSans_500Medium'>
+        <Text fontWeight='500' fontFamily='WorkSans_500Medium' color='purple'>
           {workout.workoutName}
         </Text>
         <Text color='$fieldInputPlaceholderTextColor'>
@@ -35,8 +35,8 @@ const WorkoutLogItem = ({
 
       <Box borderRadius='full' overflow='hidden'>
         <TouchableOpacity
-          bg='black700'
-          rippleColor='black500'
+          bg='$logItemButtonBg'
+          rippleColor='$logItemButtonRippleColor'
           p='sm'
           borderRadius='full'
           onPress={() => {

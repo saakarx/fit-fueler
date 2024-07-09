@@ -266,7 +266,7 @@ const SignupScreen = () => {
 
         <Text textAlign='center'>
           Already have an account?{' '}
-          <Link href='/signup' asChild>
+          <Link href='/signin' asChild>
             <Text color='pink' fontWeight='500' fontFamily='WorkSans_500Medium'>
               Sign in
             </Text>
