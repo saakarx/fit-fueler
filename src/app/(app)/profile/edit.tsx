@@ -122,7 +122,7 @@ const ProfileEditScreen = () => {
                     <Box overflow='hidden' borderRadius='full'>
                       <TouchableOpacity
                         onPress={() => router.back()}
-                        rippleColor='black700'
+                        rippleColor='$backgroundRippleColor'
                         width={36}
                         height={36}
                         borderRadius='full'
@@ -270,8 +270,8 @@ const ProfileEditScreen = () => {
               <Box overflow='hidden' borderRadius='md'>
                 <TouchableOpacity
                   onPress={() => setIsDatePickerVisible(true)}
-                  rippleColor='black700'
-                  backgroundColor='black900'
+                  backgroundColor='$background'
+                  rippleColor='$backgroundRippleColor'
                 >
                   <Box
                     justifyContent='center'
@@ -403,7 +403,7 @@ const ToggleButton = ({
         px='md'
         py='xs'
         bg={selected ? 'pink' : '$background'}
-        rippleColor='black700'
+        rippleColor='$backgroundRippleColor'
         borderWidth={1}
         borderColor='pink'
         style={[!selected && { backgroundColor: 'transparent' }]}

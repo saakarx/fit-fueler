@@ -40,7 +40,7 @@ const MealItem = ({
       gap='sm'
       justifyContent='space-between'
       alignItems='center'
-      bg='black700'
+      bg='$logItemBg'
       py='md'
       px='lg'
       borderRadius='md'
@@ -62,14 +62,14 @@ const MealItem = ({
 
       <Box overflow='hidden' borderRadius='full' opacity={isLoading ? 0.5 : 1}>
         <TouchableOpacity
-          bg='black300'
+          bg='$logItemButtonBg'
+          rippleColor='$logItemButtonRippleColor'
           p='xxs'
           width={40}
           height={40}
           borderRadius='full'
           alignItems='center'
           justifyContent='center'
-          rippleColor='black300'
           disabled={isLoading}
           onPress={async () => {
             setIsLoading(true);

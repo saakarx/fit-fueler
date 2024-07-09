@@ -170,7 +170,7 @@ const LogMealScreen = () => {
                   <Box overflow='hidden' borderRadius='full'>
                     <TouchableOpacity
                       onPress={() => router.back()}
-                      rippleColor='black700'
+                      rippleColor='$backgroundRippleColor'
                       width={36}
                       height={36}
                       borderRadius='full'
@@ -218,7 +218,7 @@ const LogMealScreen = () => {
           {!!searchTerm.length && (
             <Box borderRadius='full' overflow='hidden'>
               <TouchableOpacity
-                rippleColor='pink'
+                rippleColor='$backgroundRippleColor'
                 width={32}
                 height={32}
                 borderRadius='full'

@@ -16,7 +16,7 @@ const SignoutButton = () => {
     <Box borderRadius='md' overflow='hidden' mt='md'>
       <TouchableOpacity
         bg='$background'
-        rippleColor='black700'
+        rippleColor='$backgroundRippleColor'
         minHeight={42}
         flexDirection='row'
         alignItems='center'

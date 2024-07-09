@@ -14,7 +14,7 @@ const p = {
 
   pink: '#FEEAFA',
   purple: '#BDB2FF',
-  lightGreen: '#BEE3DB',
+  lightGreen: '#67E4C9',
   red: '#DA4167',
   yellow: '#FDFFB6',
   lightBlue: '#9BF6FF',
@@ -37,28 +37,44 @@ const theme = createTheme({
     full: 99999999,
   },
   colors: {
-    pink: p.pink,
+    pink: '#FA9EE8',
     purple: p.purple,
     white: p.white300,
     lightGreen: p.lightGreen,
     yellow: p.yellow,
     lightBlue: p.lightBlue,
 
-    activeBottomBarLink: '#9BF6FF',
-    activeBottomBarItemBg: p.white700,
-    inactiveBottomBarLink: p.white300,
-
     black300: p.black300,
     black500: p.black500,
     black700: p.black700,
     black900: p.black900,
 
-    $foreground: '#121212',
-    $background: '#fbf7fa',
-    $bottomBarBg: p.white700,
+    $foreground: p.black900,
+    $background: p.white300,
+    $backgroundRippleColor: p.white500,
+
+    $bottomBarBg: '#F8F9FA',
+    $bottomBarItemBorder: '#CED4DA',
+    $bottomBarActiveItem: '#00A7E1',
+    $bottomBarActiveItemBg: '#DEE2E6',
+    $bottomBarInactiveItem: '#CED4DA',
+    $bottomBarInactiveItemBg: '#F8F9FA',
 
     $fieldInputPlaceholderTextColor: '#6C757D',
     $fieldInputBorderColor: '#454D54',
+
+    $logItemBg: p.white500,
+    $logItemRippleColor: p.white300,
+    $logItemButtonBg: p.white700,
+    $logItemButtonRippleColor: p.white900,
+
+    $addButtonBg: p.white500,
+    $addButtonRippleColor: p.white500,
+    $addButtonBorder: '#ddd',
+
+    $addWorkoutButtonTextColor: '#0ABBCD',
+    $addMealButtonTextColor: '#C8CD0A',
+    $addWaterButtonTextColor: '#0ACD93',
 
     danger: p.red,
   },

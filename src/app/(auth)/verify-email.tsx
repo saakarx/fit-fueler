@@ -73,7 +73,7 @@ const VerifyEmailScreen = () => {
             <Input
               borderColor={
                 focusedIdx === idx
-                  ? 'activeBottomBarLink'
+                  ? '$bottomBarActiveItem'
                   : '$fieldInputBorderColor'
               }
               key={idx}

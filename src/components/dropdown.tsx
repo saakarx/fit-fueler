@@ -64,6 +64,7 @@ const Dropdown: React.FC<DropdownProps> & DropdownComposition = ({
           alignItems='center'
           justifyContent='center'
           bg='$background'
+          rippleColor='$backgroundRippleColor'
           borderRadius='sm'
           p='sm'
           px='md'
@@ -77,7 +78,7 @@ const Dropdown: React.FC<DropdownProps> & DropdownComposition = ({
           <LucideIcon
             Icon={!visible ? ChevronDownIcon : ChevronUpIcon}
             size={16}
-            stroke='white'
+            stroke='black300'
             strokeWidth={2}
           />
         </TouchableOpacity>
@@ -138,7 +139,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
   <Fragment>
     <Box overflow='hidden' borderRadius='sm'>
       <TouchableOpacity
-        rippleColor='black500'
+        rippleColor='$backgroundRippleColor'
         borderRadius='sm'
         px='md'
         py='sm'
