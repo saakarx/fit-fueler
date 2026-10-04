@@ -49,7 +49,7 @@ const MealItem = ({
         <Text
           fontSize={17}
           fontWeight='500'
-          fontFamily='WorkSans_500Medium'
+          fontFamily='Inter_500Medium'
           color='purple'
         >
           {name.trim()}

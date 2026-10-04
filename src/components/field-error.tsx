@@ -8,7 +8,7 @@ const FieldError = ({
   error,
   mt = 'xs',
   mb = 'sm',
-  fontFamily = 'WorkSans_700Bold_Italic',
+  fontFamily = 'Inter_700Bold_Italic',
   fontWeight = '700',
   fontStyle = 'italic',
   fontSize = 14,

@@ -16,16 +16,16 @@ import CreateWorkoutLogBottomSheet from '@src/components/create-workout-log-bott
 import Input from '@src/components/input';
 import LucideIcon from '@src/components/lucide-icon';
 
-import { GetWorkoutsResponse } from '@src/types.type';
+import { ActiveExercise, GetWorkoutsResponse } from '@src/types.type';
 
-const getExercises = ({
+const getExercises = async ({
   limit = 20,
   page = 1,
 }: {
   limit?: number;
   page?: number;
 }): Promise<GetWorkoutsResponse> => {
-  const EXERCISES_API_URL = new URL('https://wger.de/api/v2/exercisebaseinfo');
+  const EXERCISES_API_URL = new URL('https://wger.de/api/v2/exerciseinfo');
   EXERCISES_API_URL.searchParams.set('ordering', 'id');
   EXERCISES_API_URL.searchParams.set('limit', String(limit));
   EXERCISES_API_URL.searchParams.set('offset', String((page - 1) * limit));
@@ -36,10 +36,9 @@ const getExercises = ({
 const LogWorkoutScreen = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [deferredSearchTerm, setDeferredSearchTerm] = useState<string>('');
-  const [activeExercise, setActiveExercise] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [activeExercise, setActiveExercise] = useState<ActiveExercise | null>(
+    null
+  );
   const bottomSheetRef = useRef<RNBottomSheetModal>(null);
   const limit = useRef(20).current;
   const timer = useRef<NodeJS.Timeout>();
@@ -182,7 +181,7 @@ const LogWorkoutScreen = () => {
           <ActivityIndicator size='large' color='pink' />
           <Text
             color='pink'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
             fontWeight='500'
             fontSize={14}
           >
@@ -195,19 +194,20 @@ const LogWorkoutScreen = () => {
             data={exerciseResults}
             style={{ paddingHorizontal: 12 }}
             contentContainerStyle={{ gap: 6 }}
-            renderItem={({ item }) => {
-              const exercise = item.exercises.find(
-                exercise => exercise.language === 2
+            renderItem={({ item: exerciseItem }) => {
+              const translation = exerciseItem.translations.find(
+                item => item.language === 2
               );
-              if (!exercise) return null;
+              if (!translation) return null;
 
               return (
-                <Box key={exercise.id} borderRadius='md' overflow='hidden'>
+                <Box key={translation.id} borderRadius='md' overflow='hidden'>
                   <TouchableOpacity
                     onPress={() => {
                       setActiveExercise({
-                        id: String(exercise.id),
-                        name: exercise.name,
+                        id: String(translation.id),
+                        name: translation.name,
+                        images: exerciseItem.images,
                       });
                       handleOpenBottomSheet();
                     }}
@@ -219,7 +219,15 @@ const LogWorkoutScreen = () => {
                     alignItems='center'
                     justifyContent='space-between'
                   >
-                    <Text>{exercise.name}</Text>
+                    {/* {exerciseItem.images.length > 0 && (
+                      <Image
+                        source={{ uri: mainImage?.image }}
+                        style={{ objectFit: 'contain' }}
+                        width={100}
+                        height={100}
+                      />
+                    )} */}
+                    <Text>{translation.name}</Text>
                     <LucideIcon
                       Icon={ChevronRightIcon}
                       stroke='black300'
@@ -250,7 +258,7 @@ const LogWorkoutScreen = () => {
                     <Text
                       color='pink'
                       fontWeight='500'
-                      fontFamily='WorkSans_500Medium'
+                      fontFamily='Inter_500Medium'
                       fontSize={14}
                       marginBottom='md'
                     >

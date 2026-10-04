@@ -43,7 +43,7 @@ const AddWaterPill = ({
           strokeWidth={2}
         />
         <Text
-          fontFamily='WorkSans_600SemiBold'
+          fontFamily='Inter_600SemiBold'
           fontWeight='600'
           color='$bottomBarActiveItem'
         >
@@ -101,7 +101,7 @@ const LogWaterBottomSheet = forwardRef<
       }}
     >
       <BottomSheetView style={{ flex: 1, padding: 12 }}>
-        <Text fontSize={24} fontWeight='600' fontFamily='WorkSans_600SemiBold'>
+        <Text fontSize={24} fontWeight='600' fontFamily='Inter_600SemiBold'>
           Log your water intake
         </Text>
 
@@ -109,7 +109,7 @@ const LogWaterBottomSheet = forwardRef<
           textAlign='center'
           fontSize={40}
           fontWeight='600'
-          fontFamily='WorkSans_600SemiBold'
+          fontFamily='Inter_600SemiBold'
           my='lg'
         >
           {waterQuantity} ml
@@ -159,7 +159,7 @@ const LogWaterBottomSheet = forwardRef<
                 <Text
                   color='black900'
                   fontWeight='500'
-                  fontFamily='WorkSans_500Medium'
+                  fontFamily='Inter_500Medium'
                   lineHeight={17}
                 >
                   Log

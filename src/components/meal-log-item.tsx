@@ -30,7 +30,7 @@ const MealLogItem = ({
       justifyContent='space-between'
     >
       <Box flex={1}>
-        <Text fontWeight='500' fontFamily='WorkSans_500Medium' color='purple'>
+        <Text fontWeight='500' fontFamily='Inter_500Medium' color='purple'>
           {meal.mealName}
         </Text>
         <Text color='$fieldInputPlaceholderTextColor' style={{ flex: 1 }}>

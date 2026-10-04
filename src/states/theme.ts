@@ -1,4 +1,4 @@
-import { atom } from 'jotai';
+import { atom, createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import { Theme, ThemeNames, themes } from '@src/themes';

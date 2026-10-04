@@ -53,7 +53,7 @@ Input.Field = React.forwardRef(
   (
     {
       placeholderColor = '$fieldInputPlaceholderTextColor',
-      fontFamily = 'WorkSans_400Regular',
+      fontFamily = 'Inter_400Regular',
       color = '$foreground',
       flex = 1,
       fontSize = 16,

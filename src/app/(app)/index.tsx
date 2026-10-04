@@ -68,7 +68,7 @@ const AddWorkoutButton = () => {
           />
           <Text
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
             textAlign='center'
             color='$addWorkoutButtonTextColor'
           >
@@ -117,7 +117,7 @@ const AddMealButton = ({
           />
           <Text
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
             textAlign='center'
             color='$addMealButtonTextColor'
           >
@@ -147,10 +147,14 @@ const AddWaterButton = ({ openSheet }: { openSheet: () => void }) => {
         borderRadius='md'
         onPress={() => openSheet()}
       >
-        <LucideIcon Icon={GlassWaterIcon} stroke='$addWaterButtonTextColor' size={20} />
+        <LucideIcon
+          Icon={GlassWaterIcon}
+          stroke='$addWaterButtonTextColor'
+          size={20}
+        />
         <Text
           fontWeight='500'
-          fontFamily='WorkSans_500Medium'
+          fontFamily='Inter_500Medium'
           textAlign='center'
           color='$addWaterButtonTextColor'
         >
@@ -194,10 +198,9 @@ const WorkoutLogs = ({
   return (
     <Box>
       <Box flexDirection='row' gap='md' mb='md' alignItems='center'>
-        <Text fontSize={20} fontFamily='WorkSans_500Medium'>
-          Today's Workout
-        </Text>
-        <Text color='purple' fontFamily='WorkSans_500Medium'>
+        {/* <Text fontSize={20} fontFamily='Inter_500Medium'> */}
+        <Text variant='display_xs'>Today's Workout</Text>
+        <Text color='purple' fontFamily='Inter_500Medium'>
           ( {data?.length ?? 0} workout logged )
         </Text>
       </Box>
@@ -303,10 +306,10 @@ const MealLogs = ({
   return (
     <Box>
       <Box flexDirection='row' gap='md' mb='md' alignItems='center'>
-        <Text fontSize={20} fontFamily='WorkSans_500Medium'>
+        <Text fontSize={20} fontFamily='Inter_500Medium'>
           Today's Meals
         </Text>
-        <Text color='purple' fontFamily='WorkSans_500Medium'>
+        <Text color='purple' fontFamily='Inter_500Medium'>
           ({' '}
           {todayMeal
             ? todayMeal.breakfast.length +
@@ -320,7 +323,7 @@ const MealLogs = ({
 
       {mealTimes.map((item, idx) => (
         <Box mb='md' key={idx}>
-          <Text fontWeight='500' fontFamily='WorkSans_500Medium' fontSize={17}>
+          <Text fontWeight='500' fontFamily='Inter_500Medium' fontSize={17}>
             {item.text}
           </Text>
 
@@ -415,10 +418,10 @@ const WaterLogs = ({
   return (
     <Box>
       <Box flexDirection='row' gap='md' mb='md' alignItems='center'>
-        <Text fontSize={20} fontFamily='WorkSans_500Medium' fontWeight='500'>
+        <Text fontSize={20} fontFamily='Inter_500Medium' fontWeight='500'>
           Today's Water
         </Text>
-        <Text color='purple' fontFamily='WorkSans_500Medium' fontWeight='500'>
+        <Text color='purple' fontFamily='Inter_500Medium' fontWeight='500'>
           ( {data?.length ?? 0} water logged )
         </Text>
       </Box>

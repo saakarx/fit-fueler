@@ -128,7 +128,7 @@ const VerifyEmailScreen = () => {
                   lineHeight={21}
                   color='black900'
                   fontWeight='500'
-                  fontFamily='WorkSans_500Medium'
+                  fontFamily='Inter_500Medium'
                 >
                   Verify OTP
                 </Text>

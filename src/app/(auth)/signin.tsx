@@ -156,7 +156,7 @@ const SigninScreen = () => {
                 <Text
                   textAlign='right'
                   fontWeight='500'
-                  fontFamily='WorkSans_500Medium'
+                  fontFamily='Inter_500Medium'
                   color='pink'
                 >
                   Forgot password?
@@ -197,7 +197,7 @@ const SigninScreen = () => {
                             fontSize={16}
                             lineHeight={21}
                             color='black900'
-                            fontFamily='WorkSans_500Medium'
+                            fontFamily='Inter_500Medium'
                           >
                             Sign in
                           </Text>
@@ -218,7 +218,7 @@ const SigninScreen = () => {
         <Text textAlign='center'>
           Don’t have an account?{' '}
           <Link href='/signup' asChild>
-            <Text color='pink' fontWeight='500' fontFamily='WorkSans_500Medium'>
+            <Text color='pink' fontWeight='500' fontFamily='Inter_500Medium'>
               Create one
             </Text>
           </Link>

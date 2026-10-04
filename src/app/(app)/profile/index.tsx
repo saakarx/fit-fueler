@@ -80,7 +80,7 @@ const ProfileScreen = () => {
 
           <Box flexDirection='row' alignItems='center' gap='md' mt='lg'>
             <Text
-              fontFamily='WorkSans_500Medium'
+              fontFamily='Inter_500Medium'
               fontWeight='500'
               fontSize={22}
             >
@@ -167,7 +167,7 @@ const ProfileScreen = () => {
         >
           <Text
             fontSize={18}
-            fontFamily='WorkSans_600SemiBold'
+            fontFamily='Inter_600SemiBold'
             fontWeight='600'
           >
             Notifications

@@ -8,7 +8,7 @@ const FieldLabel = ({ label }: { label: string }) => {
       color='$fieldInputPlaceholderTextColor'
       fontSize={15}
       fontWeight='500'
-      fontFamily='WorkSans_500Medium'
+      fontFamily='Inter_500Medium'
       mt='sm'
       mb='xs'
     >

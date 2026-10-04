@@ -42,7 +42,7 @@ const BottomBarButton: FC<BottomBarButtonProps> = ({ icon, text, href }) => {
           {activeRoute && (
             <Text
               color='$bottomBarActiveItem'
-              fontFamily='WorkSans_500Medium'
+              fontFamily='Inter_500Medium'
               fontWeight='500'
               fontSize={11}
             >

@@ -8,8 +8,8 @@ import { format } from 'date-fns';
 import { Formik } from 'formik';
 import { useSetAtom } from 'jotai';
 import { PlusIcon } from 'lucide-react-native';
-import React, { forwardRef, Fragment } from 'react';
-import { GestureResponderEvent } from 'react-native';
+import React, { forwardRef, Fragment, useEffect, useState } from 'react';
+import { GestureResponderEvent, Image } from 'react-native';
 import Snackbar from 'react-native-snackbar';
 import * as yup from 'yup';
 
@@ -17,6 +17,8 @@ import {
   ActivityIndicator,
   BottomSheetModal,
   Box,
+  Pressable,
+  ScrollView,
   Text,
   TouchableOpacity,
 } from '@src/atoms';
@@ -27,6 +29,7 @@ import LucideIcon from './lucide-icon';
 import { useAuth } from '@src/context/auth';
 import { createWorkoutLog } from '@src/firebase';
 import { addWorkoutLogAtom } from '@src/states/log-workouts';
+import type { ActiveExercise, ExerciseImage } from '@src/types.type';
 
 const addWorkoutLogSchema = yup.object({
   reps: yup.number().positive('Must be negative').required('Required'),
@@ -35,7 +38,7 @@ const addWorkoutLogSchema = yup.object({
 });
 
 type Props = {
-  activeExercise: { id: string; name: string } | null;
+  activeExercise: ActiveExercise | null;
   closeModal: () => void;
 };
 
@@ -43,6 +46,17 @@ const CreateWorkoutLogBottomSheet = forwardRef<RNBottomSheetModal, Props>(
   ({ activeExercise, closeModal }, ref) => {
     const { auth } = useAuth();
     const addWorkoutLog = useSetAtom(addWorkoutLogAtom);
+    const [activeImg, setActiveImg] = useState<ExerciseImage | undefined>(
+      undefined
+    );
+
+    useEffect(() => {
+      setActiveImg(
+        () =>
+          activeExercise?.images.find(i => i.is_main) ||
+          activeExercise?.images.at(0)
+      );
+    }, [activeExercise]);
 
     const onSubmit = async (values: {
       reps: string;
@@ -111,14 +125,17 @@ const CreateWorkoutLogBottomSheet = forwardRef<RNBottomSheetModal, Props>(
         bottomInset={12}
         keyboardBehavior='fillParent'
         keyboardBlurBehavior='restore'
-        onDismiss={() => closeModal()}
+        onDismiss={() => {
+          setActiveImg(undefined);
+          closeModal();
+        }}
         style={{ marginHorizontal: 12 }}
       >
         <BottomSheetView style={{ flex: 1, padding: 12 }}>
           <Text
             mb='xs'
             fontWeight='400'
-            fontFamily='BricolageGrotesque_400Regular'
+            fontFamily='BricolageGrotesque_esque_400Regular'
             textTransform='uppercase'
             letterSpacing={3}
           >
@@ -128,11 +145,44 @@ const CreateWorkoutLogBottomSheet = forwardRef<RNBottomSheetModal, Props>(
             color='pink'
             fontSize={24}
             fontWeight='600'
-            fontFamily='WorkSans_600SemiBold'
+            fontFamily='Inter_600SemiBold'
             mb='lg'
           >
             {activeExercise && activeExercise.name}
           </Text>
+
+          <Box>
+            <Box>
+              {activeImg && (
+                <Image
+                  source={{ uri: activeImg.image }}
+                  width={150}
+                  height={150}
+                  style={{ objectFit: 'contain' }}
+                />
+              )}
+            </Box>
+            <ScrollView rowGap='2xl' horizontal={true}>
+              {activeExercise?.images.map(i => (
+                <Pressable
+                  onPress={() => setActiveImg(i)}
+                  borderColor={
+                    activeImg?.id === i.id ? '$addButtonBorder' : '$background'
+                  }
+                  borderWidth={2}
+                  borderRadius='sm'
+                >
+                  <Image
+                    key={i.id}
+                    source={{ uri: i.image }}
+                    width={50}
+                    height={50}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Box>
 
           <Formik
             initialValues={{ sets: '', reps: '', weight: '' }}
@@ -263,7 +313,7 @@ const SubmitButton = ({
             fontSize={15}
             lineHeight={17}
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
           >
             Log Workout
           </Text>

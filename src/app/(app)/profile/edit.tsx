@@ -282,7 +282,7 @@ const ProfileEditScreen = () => {
                     p='md'
                   >
                     <Text
-                      fontFamily='WorkSans_400Regular'
+                      fontFamily='Inter_400Regular'
                       color={
                         values.dateOfBirth
                           ? '$foreground'
@@ -374,7 +374,7 @@ const SubmitButton = ({
             fontSize={15}
             lineHeight={17}
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
           >
             Update
           </Text>
@@ -411,7 +411,7 @@ const ToggleButton = ({
       >
         <Text
           fontWeight={selected ? '500' : '400'}
-          fontFamily={selected ? 'WorkSans_500Medium' : 'WorkSans_400Regular'}
+          fontFamily={selected ? 'Inter_500Medium' : 'Inter_400Regular'}
           color={selected ? 'black900' : 'pink'}
         >
           {text}

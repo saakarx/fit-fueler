@@ -86,7 +86,7 @@ const DatePill = ({
         <Text
           fontSize={13}
           fontWeight='500'
-          fontFamily='WorkSans_500Medium'
+          fontFamily='Inter_500Medium'
           marginBottom='xs'
           color={isActive ? 'white' : 'black300'}
         >
@@ -95,7 +95,7 @@ const DatePill = ({
         <Text
           fontSize={15}
           fontWeight='600'
-          fontFamily='WorkSans_600SemiBold'
+          fontFamily='Inter_600SemiBold'
           color={isActive ? 'white' : 'black300'}
         >
           {date.getDate()}
@@ -273,7 +273,7 @@ const MealLogs = ({ selectedDate }: { selectedDate: Date }) => {
           color='danger'
           fontSize={20}
           fontWeight='600'
-          fontFamily='WorkSans_600SemiBold'
+          fontFamily='Inter_600SemiBold'
         >
           {mealsError.message}
         </Text>
@@ -309,7 +309,7 @@ const MealLogs = ({ selectedDate }: { selectedDate: Date }) => {
             <Text
               fontSize={17}
               fontWeight='500'
-              fontFamily='WorkSans_500Medium'
+              fontFamily='Inter_500Medium'
               color='$fieldInputPlaceholderTextColor'
               style={{ marginTop: item.mt }}
             >
@@ -406,7 +406,7 @@ const LogsScreen = () => {
           >
             Logs
           </Text>
-          <Text fontFamily='WorkSans_500Medium' fontWeight='500' fontSize={18}>
+          <Text fontFamily='Inter_500Medium' fontWeight='500' fontSize={18}>
             {format(selectedDate, 'MMMM yyyy')}
           </Text>
         </Box>
@@ -447,7 +447,7 @@ const LogsScreen = () => {
 
         {/* Workout Logs */}
         <Box mt='lg'>
-          <Text fontSize={20} fontFamily='WorkSans_500Medium'>
+          <Text fontSize={20} fontFamily='Inter_500Medium'>
             Workouts
           </Text>
 
@@ -456,7 +456,7 @@ const LogsScreen = () => {
 
         {/* Meal Logs */}
         <Box mt='lg'>
-          <Text fontSize={22} fontFamily='WorkSans_500Medium'>
+          <Text fontSize={22} fontFamily='Inter_500Medium'>
             Meals
           </Text>
 
@@ -465,7 +465,7 @@ const LogsScreen = () => {
 
         {/* Water Logs */}
         <Box mt='lg'>
-          <Text fontSize={20} fontFamily='WorkSans_500Medium'>
+          <Text fontSize={20} fontFamily='Inter_500Medium'>
             Water
           </Text>
 

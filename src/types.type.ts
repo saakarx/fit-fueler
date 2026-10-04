@@ -19,8 +19,8 @@ interface Result {
   equipment: Equipment[];
   license: License;
   license_author: string;
-  images: any[];
-  exercises: Exercise[];
+  images: ExerciseImage[];
+  translations: Translation[];
   variations?: number;
   videos: Video[];
   author_history: string[];
@@ -53,11 +53,28 @@ interface License {
   url: string;
 }
 
-interface Exercise {
+export type ExerciseImage = {
+  id: number;
+  uuid: string;
+  exercise: number;
+  exercise_uuid: string;
+  image: string;
+  is_main: boolean;
+  style: string;
+  license: number;
+  license_title: string;
+  license_object_url: string;
+  license_author: string;
+  license_author_url: string;
+  license_derivative_source_url: string;
+  author_history: string[];
+};
+
+interface Translation {
   id: number;
   uuid: string;
   name: string;
-  exercise_base: number;
+  exercise: number;
   description: string;
   created: string;
   language: number;
@@ -92,6 +109,12 @@ interface Video {
   license_derivative_source_url: string;
   author_history: string[];
 }
+
+export type ActiveExercise = {
+  id: string;
+  name: string;
+  images: ExerciseImage[];
+};
 
 export type GetFoodsResponse = Food[];
 

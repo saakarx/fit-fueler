@@ -244,7 +244,7 @@ const LogMealScreen = () => {
           <Text
             color='pink'
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
             fontSize={14}
             marginBottom='md'
           >
@@ -296,7 +296,7 @@ const LogMealScreen = () => {
                     <Text
                       color='pink'
                       fontWeight='500'
-                      fontFamily='WorkSans_500Medium'
+                      fontFamily='Inter_500Medium'
                       fontSize={14}
                       marginBottom='md'
                     >

@@ -245,7 +245,7 @@ const SignupScreen = () => {
                             fontSize={16}
                             lineHeight={21}
                             color='black900'
-                            fontFamily='WorkSans_500Medium'
+                            fontFamily='Inter_ium'
                           >
                             Sign up
                           </Text>
@@ -267,7 +267,7 @@ const SignupScreen = () => {
         <Text textAlign='center'>
           Already have an account?{' '}
           <Link href='/signin' asChild>
-            <Text color='pink' fontWeight='500' fontFamily='WorkSans_500Medium'>
+            <Text color='pink' fontWeight='500' fontFamily='Inter_ium'>
               Sign in
             </Text>
           </Link>

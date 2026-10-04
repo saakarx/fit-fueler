@@ -50,7 +50,7 @@ const Charts = () => {
             fontSize={14}
             color='pink'
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
           >
             Loading...
           </Text>
@@ -73,7 +73,7 @@ const Charts = () => {
             fontSize={14}
             color='pink'
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
           >
             Loading...
           </Text>
@@ -96,7 +96,7 @@ const Charts = () => {
             fontSize={14}
             color='pink'
             fontWeight='500'
-            fontFamily='WorkSans_500Medium'
+            fontFamily='Inter_500Medium'
           >
             Loading...
           </Text>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 20,
     fontWeight: '500',
-    fontFamily: 'WorkSans_500Medium',
+    fontFamily: 'Inter_500Medium',
     color: 'white',
 
     marginTop: 24,

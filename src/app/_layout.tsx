@@ -3,8 +3,14 @@ import {
   WorkSans_500Medium,
   WorkSans_600SemiBold,
   WorkSans_700Bold_Italic,
-  useFonts,
 } from '@expo-google-fonts/work-sans';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@shopify/restyle';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -31,6 +37,10 @@ const Layout = () => {
     WorkSans_500Medium,
     WorkSans_600SemiBold,
     WorkSans_700Bold_Italic,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
   });
   const activeTheme = useAtomValue(activeThemeAtom);
 

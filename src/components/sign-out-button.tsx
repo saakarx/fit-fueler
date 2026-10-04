@@ -40,7 +40,7 @@ const SignoutButton = () => {
             <Text
               color='danger'
               fontWeight='500'
-              fontFamily='WorkSans_500Medium'
+              fontFamily='Inter_500Medium'
               textTransform='uppercase'
               letterSpacing={2}
               lineHeight={20}

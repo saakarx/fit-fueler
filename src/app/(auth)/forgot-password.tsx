@@ -68,7 +68,7 @@ const ForgotPasswordScreen = () => {
                   fontSize={16}
                   lineHeight={21}
                   color='black900'
-                  fontFamily='WorkSans_500Medium'
+                  fontFamily='Inter_500Medium'
                 >
                   Send OTP
                 </Text>

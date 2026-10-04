@@ -31,7 +31,7 @@ const WaterLogItem = ({
       justifyContent='space-between'
     >
       <Box>
-        <Text fontWeight='500' fontFamily='WorkSans_500Medium' color='purple'>
+        <Text fontWeight='500' fontFamily='Inter_500Medium' color='purple'>
           Water
         </Text>
         <Text color='$fieldInputPlaceholderTextColor'>{water.quantity} ml</Text>

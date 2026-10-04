@@ -1,14 +1,15 @@
 import { useAtom } from 'jotai';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react-native';
+import { CheckIcon, ChevronDownIcon } from 'lucide-react-native';
 import React, { Fragment, useState } from 'react';
 import { Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@shopify/restyle';
 
 import { Box, Text, TouchableOpacity } from '@src/atoms';
 import LucideIcon from './lucide-icon';
 
 import { activeThemeId } from '@src/states/theme';
-import { ThemeNames, themes } from '@src/themes';
+import { Theme, ThemeNames, themes } from '@src/themes';
 
 const ChangeTheme = () => {
   const [dimens, setDimens] = useState<{ x: number; y: number }>({
@@ -31,7 +32,7 @@ const ChangeTheme = () => {
         setDimens({ x: e.nativeEvent.layout.x, y: e.nativeEvent.layout.y })
       }
     >
-      <Text fontSize={18} fontFamily='WorkSans_600SemiBold' fontWeight='600'>
+      <Text fontSize={18} fontFamily='Inter_600SemiBold' fontWeight='600'>
         Change theme
       </Text>
 
@@ -50,6 +51,7 @@ const ChangeThemeDropdown = ({ fromTop = 0 }: { fromTop?: number }) => {
   }>({ width: 0, height: 0, x: 0, y: 0 });
 
   const [activeTheme, setActiveTheme] = useAtom(activeThemeId);
+  const { colors } = useTheme<Theme>();
 
   const toggleDropdown = (visibility: boolean) => {
     setVisible(visibility);
@@ -84,10 +86,11 @@ const ChangeThemeDropdown = ({ fromTop = 0 }: { fromTop?: number }) => {
             {themes.find(i => i.id === activeTheme)?.title ?? themes[0].title}
           </Text>
           <LucideIcon
-            Icon={!visible ? ChevronDownIcon : ChevronUpIcon}
+            Icon={ChevronDownIcon}
             size={16}
-            stroke='white'
+            stroke='$foreground'
             strokeWidth={2}
+            transform={[{ rotate: visible ? '180deg' : '0deg' }]}
           />
         </TouchableOpacity>
       </Box>

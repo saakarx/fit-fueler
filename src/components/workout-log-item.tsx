@@ -25,7 +25,7 @@ const WorkoutLogItem = ({
       justifyContent='space-between'
     >
       <Box>
-        <Text fontWeight='500' fontFamily='WorkSans_500Medium' color='purple'>
+        <Text fontWeight='500' fontFamily='Inter_500Medium' color='purple'>
           {workout.workoutName}
         </Text>
         <Text color='$fieldInputPlaceholderTextColor'>
