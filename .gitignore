@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+
+# Logs
+*.log
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Generated native projects (also ignored inside mobile/, kept here as a safeguard)
+mobile/android/
+mobile/ios/
+
+# Local scratch folders
+*_old/
+tmp/
