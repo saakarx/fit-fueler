@@ -3,28 +3,29 @@ import {
   WorkSans_500Medium,
   WorkSans_600SemiBold,
   WorkSans_700Bold_Italic,
-} from '@expo-google-fonts/work-sans';
+} from "@expo-google-fonts/work-sans";
 import {
   useFonts,
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
-} from '@expo-google-fonts/inter';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ThemeProvider } from '@shopify/restyle';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SplashScreen, Stack } from 'expo-router';
-import { useAtomValue } from 'jotai';
-import React, { useEffect } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "@expo-google-fonts/inter";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { ThemeProvider } from "@shopify/restyle";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SplashScreen, Stack } from "expo-router";
+import { useAtomValue } from "jotai";
+import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { HeroUINativeProvider } from "heroui-native";
 
-import { StatusBar } from '@src/atoms';
+import { StatusBar } from "@src/atoms";
 
-import { activeThemeAtom } from '@src/states/theme';
+import { activeThemeAtom } from "@src/states/theme";
 
-import AuthProvider from '@src/context/auth';
+import AuthProvider from "@src/context/auth";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,7 +33,7 @@ const queryClient = new QueryClient();
 
 const Layout = () => {
   const [fontsLoaded, fontsError] = useFonts({
-    BricolageGrotesque_400Regular: require('../../assets/BricolageGrotesque-Regular.ttf'),
+    BricolageGrotesque_400Regular: require("../../assets/BricolageGrotesque-Regular.ttf"),
     WorkSans_400Regular,
     WorkSans_500Medium,
     WorkSans_600SemiBold,
@@ -57,15 +58,17 @@ const Layout = () => {
       <AuthProvider>
         <ThemeProvider theme={activeTheme}>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <BottomSheetModalProvider>
-              <SafeAreaView style={{ flex: 1 }}>
-                <StatusBar />
-                <Stack
-                  initialRouteName='/(auth)/signin'
-                  screenOptions={{ headerShown: false }}
-                />
-              </SafeAreaView>
-            </BottomSheetModalProvider>
+            <HeroUINativeProvider>
+              <BottomSheetModalProvider>
+                <SafeAreaView style={{ flex: 1 }}>
+                  <StatusBar />
+                  <Stack
+                    initialRouteName="/(auth)/signin"
+                    screenOptions={{ headerShown: false }}
+                  />
+                </SafeAreaView>
+              </BottomSheetModalProvider>
+            </HeroUINativeProvider>
           </GestureHandlerRootView>
         </ThemeProvider>
       </AuthProvider>

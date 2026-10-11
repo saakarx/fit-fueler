@@ -9,22 +9,12 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "splash": {
-        "image": "./assets/splash-light.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#F8F9FA"
-      },
       "bundleIdentifier": "com.saakar.fitfueler",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png"
-      },
-      "splash": {
-        "image": "./assets/splash-light.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#F8F9FA"
       },
       "package": "com.saakar.fitfueler",
       "googleServicesFile": "./google-services.json"
@@ -48,7 +38,17 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-light.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#F8F9FA"
+        }
+      ],
+      "expo-image",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "router": {
