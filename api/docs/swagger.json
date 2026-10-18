@@ -1,0 +1,2287 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Backend for the Fit Fueler mobile app: workouts, meals, water and analytics.",
+        "title": "Fit Fueler API",
+        "contact": {},
+        "version": "0.1"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/apple": {
+            "post": {
+                "description": "Reserved for Sign in with Apple. Currently always returns 501.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in with Apple (not available yet)",
+                "responses": {
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/dev-login": {
+            "post": {
+                "description": "Signs in (or creates) a user by email without any provider. Only registered when DEV_LOGIN_ENABLED=true, which is refused in production.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Development login",
+                "parameters": [
+                    {
+                        "description": "Dev user",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.DevLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/google": {
+            "post": {
+                "description": "Verifies a Google ID token and returns an access/refresh token pair. The account is created on first sign-in (is_new_user = true).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in with Google",
+                "parameters": [
+                    {
+                        "description": "Google ID token and device details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.GoogleSignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Revokes the session that the refresh token belongs to. Always returns 204.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign out",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RefreshRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Exchanges a refresh token for a new access/refresh pair. The old refresh token stops working. Reusing an old token revokes the whole session.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh the access token",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RefreshRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.TokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exercises": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Searches the shared catalog and the user's own custom exercises. Results are ordered by relevance (exact name, prefix, shorter names). has_more tells the app whether to load another page.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "Search exercises",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search text (max 100 characters)",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exact category, e.g. Chest",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exact muscle name",
+                        "name": "muscle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exact equipment name",
+                        "name": "equipment",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "all (default), catalog or custom",
+                        "name": "scope",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Language code of the name, e.g. en (default: any)",
+                        "name": "language",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size, 1-50 (default 20)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items to skip (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exercise.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Adds an exercise only the current user can see. met_value is estimated from the category and name when omitted. Names are unique per user (409 exercise_exists).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "Create a custom exercise",
+                "parameters": [
+                    {
+                        "description": "Exercise",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/exercise.CreateExerciseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/exercise.ExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exercises/categories": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Categories visible to the user, with the number of exercises in each.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "List exercise categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exercise.CategoriesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/exercises/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "Get an exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exercise.ExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft-deletes the user's own custom exercise. Logged workouts keep their own copy of the exercise name.",
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "Delete a custom exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partial update of the user's own custom exercise. Catalog exercises are read-only (403 exercise_read_only).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "exercises"
+                ],
+                "summary": "Update a custom exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exercise ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/exercise.UpdateExerciseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/exercise.ExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the account of the authenticated user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "me"
+                ],
+                "summary": "Get the current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft-deletes the account, scrubs personal fields (email, name, provider IDs, profile details) and revokes all sessions. Remaining logs stay anonymous. Full purge is handled outside the API on request.",
+                "tags": [
+                    "me"
+                ],
+                "summary": "Delete the current account",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me/goals": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the goals that apply today. 404 goals_not_set until the profile is complete or goals are set manually.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "goals"
+                ],
+                "summary": "Get today's goals",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.GoalsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Stores goals chosen by the user, effective from today. Earlier days keep the goals that applied then. Profile changes no longer overwrite them.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "goals"
+                ],
+                "summary": "Set goals",
+                "parameters": [
+                    {
+                        "description": "Goals",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.SetGoalsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.GoalsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me/goals/reset": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Replaces today's goals with defaults computed from the profile and latest weight. Needs a complete profile (422 profile_incomplete otherwise).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "goals"
+                ],
+                "summary": "Reset goals to suggested defaults",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.GoalsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me/profile": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the profile with the current weight (latest entry), age, units, timezone and whether the profile is complete.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Get the profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.ProfileResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partial update: omitted fields stay unchanged. weight_kg adds a weight entry dated today. When the profile is complete and the user has not set their own goals, suggested goals are recalculated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Update the profile",
+                "parameters": [
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.ProfileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/weight-entries": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Entries between two local dates, newest first. Defaults to the last 90 days. At most 500 entries and a 2-year range.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "weight"
+                ],
+                "summary": "List weight entries",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date, YYYY-MM-DD",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date, YYYY-MM-DD (default: today)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profile.WeightListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Records a weight. The date defaults to today in the user's timezone; pass local_date to backfill. Suggested goals are recalculated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "weight"
+                ],
+                "summary": "Add a weight entry",
+                "parameters": [
+                    {
+                        "description": "Weight",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.AddWeightRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/profile.WeightEntryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/weight-entries/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft-deletes an entry and recalculates suggested goals.",
+                "tags": [
+                    "weight"
+                ],
+                "summary": "Delete a weight entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Weight entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workout-entries": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Adds an exercise to the user's workout for a local date (default today), creating the workout if needed. Omitted duration_min and calories_burned are estimated (flags duration_estimated / calories_estimated). Send an Idempotency-Key header (a UUID generated once per submit) so a retried request cannot create a duplicate: a replay returns the existing entry with 200.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Log an exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID generated by the client for this submit",
+                        "name": "Idempotency-Key",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Entry",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/workout.CreateEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Replay of an earlier request with the same Idempotency-Key",
+                        "schema": {
+                            "$ref": "#/definitions/workout.EntryResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/workout.EntryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workout-entries/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft-deletes the entry. A workout left without entries is deleted as well.",
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Delete a logged exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partial update. Changing sets re-estimates an estimated duration, and a changed duration re-estimates estimated calories. Values you send are kept as given.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Edit a logged exercise",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/workout.UpdateEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workout.EntryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workouts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Workouts with their entries and totals between two local dates, newest first. Both dates default to today in the user's timezone. At most 200 workouts and a 366-day range.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "List workouts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date, YYYY-MM-DD (default: to)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date, YYYY-MM-DD (default: today)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workout.WorkoutListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workouts/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Get a workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workout.WorkoutResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft-deletes the workout and all of its entries.",
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Delete a workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partial update of the name and notes. An empty string clears the field.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Rename or annotate a workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/workout.UpdateWorkoutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workout.WorkoutResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "auth.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer",
+                    "example": 900
+                },
+                "is_new_user": {
+                    "type": "boolean"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string",
+                    "example": "Bearer"
+                },
+                "user": {
+                    "$ref": "#/definitions/user.Response"
+                }
+            }
+        },
+        "auth.DevLoginRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "device_info": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "email": {
+                    "type": "string",
+                    "example": "dev@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "Dev User"
+                },
+                "timezone": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "example": "Asia/Kolkata"
+                }
+            }
+        },
+        "auth.GoogleSignInRequest": {
+            "type": "object",
+            "required": [
+                "id_token"
+            ],
+            "properties": {
+                "device_info": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "example": "Pixel 8, Android 15"
+                },
+                "id_token": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "example": "Asia/Kolkata"
+                }
+            }
+        },
+        "auth.RefreshRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer",
+                    "example": 900
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string",
+                    "example": "Bearer"
+                }
+            }
+        },
+        "exercise.Attribution": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string",
+                    "example": "Jane Doe; John Roe"
+                },
+                "license": {
+                    "type": "string",
+                    "example": "CC-BY-SA 4"
+                },
+                "source": {
+                    "type": "string",
+                    "example": "wger"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://wger.de"
+                }
+            }
+        },
+        "exercise.CategoriesResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/exercise.CategoryResponse"
+                    }
+                }
+            }
+        },
+        "exercise.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Chest"
+                }
+            }
+        },
+        "exercise.CreateExerciseRequest": {
+            "type": "object",
+            "required": [
+                "category",
+                "name"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "enum": [
+                        "Abs",
+                        "Arms",
+                        "Back",
+                        "Calves",
+                        "Cardio",
+                        "Chest",
+                        "Legs",
+                        "Shoulders",
+                        "Other"
+                    ],
+                    "example": "Shoulders"
+                },
+                "equipment": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Cable"
+                    ]
+                },
+                "language": {
+                    "description": "Language is the language of the name as a code like \"en\" (default \"en\").",
+                    "type": "string",
+                    "maxLength": 12,
+                    "minLength": 2,
+                    "example": "en"
+                },
+                "met_value": {
+                    "description": "MetValue is optional. When omitted it is estimated from the category and name.",
+                    "type": "number",
+                    "maximum": 20,
+                    "minimum": 1,
+                    "example": 4
+                },
+                "muscles": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Rear deltoids"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2,
+                    "example": "Cable Face Pull"
+                }
+            }
+        },
+        "exercise.ExerciseResponse": {
+            "type": "object",
+            "properties": {
+                "attribution": {
+                    "description": "Attribution is present for catalog exercises only.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/exercise.Attribution"
+                        }
+                    ]
+                },
+                "category": {
+                    "type": "string",
+                    "example": "Chest"
+                },
+                "equipment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "example": "0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_custom": {
+                    "type": "boolean"
+                },
+                "language": {
+                    "type": "string",
+                    "example": "en"
+                },
+                "met_value": {
+                    "type": "number",
+                    "example": 4
+                },
+                "muscles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bench Press"
+                }
+            }
+        },
+        "exercise.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "has_more": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/exercise.ExerciseResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "offset": {
+                    "type": "integer",
+                    "example": 0
+                }
+            }
+        },
+        "exercise.UpdateExerciseRequest": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "enum": [
+                        "Abs",
+                        "Arms",
+                        "Back",
+                        "Calves",
+                        "Cardio",
+                        "Chest",
+                        "Legs",
+                        "Shoulders",
+                        "Other"
+                    ]
+                },
+                "equipment": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "language": {
+                    "type": "string",
+                    "maxLength": 12,
+                    "minLength": 2
+                },
+                "met_value": {
+                    "type": "number",
+                    "maximum": 20,
+                    "minimum": 1
+                },
+                "muscles": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                }
+            }
+        },
+        "httpx.ErrorBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "invalid_token"
+                },
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/httpx.FieldError"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "The sign-in token could not be verified"
+                },
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "httpx.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/httpx.ErrorBody"
+                }
+            }
+        },
+        "httpx.FieldError": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "example": "timezone"
+                },
+                "rule": {
+                    "type": "string",
+                    "example": "max"
+                }
+            }
+        },
+        "profile.AddWeightRequest": {
+            "type": "object",
+            "required": [
+                "weight_kg"
+            ],
+            "properties": {
+                "local_date": {
+                    "type": "string",
+                    "example": "2026-10-19"
+                },
+                "logged_at": {
+                    "type": "string",
+                    "example": "2026-10-19T07:30:00+05:30"
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "maximum": 500,
+                    "minimum": 20,
+                    "example": 68.5
+                }
+            }
+        },
+        "profile.GoalsResponse": {
+            "type": "object",
+            "properties": {
+                "calories_kcal": {
+                    "type": "integer",
+                    "example": 2400
+                },
+                "carbs_g": {
+                    "type": "integer",
+                    "example": 300
+                },
+                "effective_from": {
+                    "type": "string",
+                    "example": "2026-10-19"
+                },
+                "fat_g": {
+                    "type": "integer",
+                    "example": 70
+                },
+                "protein_g": {
+                    "type": "integer",
+                    "example": 130
+                },
+                "source": {
+                    "type": "string",
+                    "enum": [
+                        "suggested",
+                        "user"
+                    ],
+                    "example": "suggested"
+                },
+                "water_ml": {
+                    "type": "integer",
+                    "example": 2800
+                },
+                "workouts_per_week": {
+                    "type": "integer",
+                    "example": 4
+                }
+            }
+        },
+        "profile.ProfileResponse": {
+            "type": "object",
+            "properties": {
+                "activity_level": {
+                    "type": "string",
+                    "example": "moderate"
+                },
+                "age": {
+                    "type": "integer",
+                    "example": 24
+                },
+                "birth_date": {
+                    "type": "string",
+                    "example": "2002-04-25"
+                },
+                "height_cm": {
+                    "type": "number",
+                    "example": 175
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Saakar"
+                },
+                "notifications_enabled": {
+                    "type": "boolean"
+                },
+                "profile_completed": {
+                    "description": "ProfileCompleted is true once sex, birth date, height and a weight entry exist.",
+                    "type": "boolean"
+                },
+                "sex": {
+                    "type": "string",
+                    "example": "male"
+                },
+                "timezone": {
+                    "type": "string",
+                    "example": "Asia/Kolkata"
+                },
+                "units": {
+                    "$ref": "#/definitions/profile.Units"
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "example": 68.5
+                }
+            }
+        },
+        "profile.SetGoalsRequest": {
+            "type": "object",
+            "required": [
+                "calories_kcal",
+                "water_ml",
+                "workouts_per_week"
+            ],
+            "properties": {
+                "calories_kcal": {
+                    "type": "integer",
+                    "maximum": 10000,
+                    "minimum": 800,
+                    "example": 2400
+                },
+                "carbs_g": {
+                    "type": "integer",
+                    "maximum": 2000,
+                    "minimum": 0,
+                    "example": 300
+                },
+                "fat_g": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "example": 70
+                },
+                "protein_g": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "example": 130
+                },
+                "water_ml": {
+                    "type": "integer",
+                    "maximum": 10000,
+                    "minimum": 500,
+                    "example": 2800
+                },
+                "workouts_per_week": {
+                    "type": "integer",
+                    "maximum": 14,
+                    "minimum": 0,
+                    "example": 4
+                }
+            }
+        },
+        "profile.Units": {
+            "type": "object",
+            "required": [
+                "distance",
+                "energy",
+                "height",
+                "water",
+                "weight"
+            ],
+            "properties": {
+                "distance": {
+                    "type": "string",
+                    "enum": [
+                        "km",
+                        "mi"
+                    ],
+                    "example": "km"
+                },
+                "energy": {
+                    "type": "string",
+                    "enum": [
+                        "kcal",
+                        "kj"
+                    ],
+                    "example": "kcal"
+                },
+                "height": {
+                    "type": "string",
+                    "enum": [
+                        "cm",
+                        "ft_in"
+                    ],
+                    "example": "cm"
+                },
+                "water": {
+                    "type": "string",
+                    "enum": [
+                        "ml",
+                        "fl_oz"
+                    ],
+                    "example": "ml"
+                },
+                "weight": {
+                    "type": "string",
+                    "enum": [
+                        "kg",
+                        "lb"
+                    ],
+                    "example": "kg"
+                }
+            }
+        },
+        "profile.UpdateProfileRequest": {
+            "type": "object",
+            "properties": {
+                "activity_level": {
+                    "type": "string",
+                    "enum": [
+                        "sedentary",
+                        "light",
+                        "moderate",
+                        "active",
+                        "very_active"
+                    ],
+                    "example": "moderate"
+                },
+                "birth_date": {
+                    "type": "string",
+                    "example": "2002-04-25"
+                },
+                "height_cm": {
+                    "type": "number",
+                    "maximum": 272,
+                    "minimum": 50,
+                    "example": 175
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "Saakar"
+                },
+                "notifications_enabled": {
+                    "type": "boolean"
+                },
+                "sex": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other"
+                    ],
+                    "example": "male"
+                },
+                "timezone": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "example": "Asia/Kolkata"
+                },
+                "units": {
+                    "$ref": "#/definitions/profile.Units"
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "maximum": 500,
+                    "minimum": 20,
+                    "example": 68.5
+                }
+            }
+        },
+        "profile.WeightEntryResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                },
+                "local_date": {
+                    "type": "string",
+                    "example": "2026-10-19"
+                },
+                "logged_at": {
+                    "type": "string",
+                    "example": "2026-10-19T02:00:00Z"
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "example": 68.5
+                }
+            }
+        },
+        "profile.WeightListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/profile.WeightEntryResponse"
+                    }
+                }
+            }
+        },
+        "user.Response": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string",
+                    "example": "https://api.dicebear.com/10.x/adventurer/svg?seed=0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string",
+                    "example": "Saakar"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "saakar@example.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                }
+            }
+        },
+        "workout.CreateEntryRequest": {
+            "type": "object",
+            "required": [
+                "exercise_id",
+                "reps",
+                "sets"
+            ],
+            "properties": {
+                "calories_burned": {
+                    "type": "number",
+                    "maximum": 20000,
+                    "minimum": 0,
+                    "example": 90
+                },
+                "distance_m": {
+                    "type": "number",
+                    "maximum": 1000000,
+                    "minimum": 0,
+                    "example": 5000
+                },
+                "duration_min": {
+                    "type": "number",
+                    "maximum": 1440,
+                    "example": 12
+                },
+                "exercise_id": {
+                    "type": "string",
+                    "example": "0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                },
+                "local_date": {
+                    "type": "string",
+                    "example": "2026-10-19"
+                },
+                "reps": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "example": 10
+                },
+                "sets": {
+                    "type": "integer",
+                    "maximum": 50,
+                    "minimum": 1,
+                    "example": 3
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "example": 40
+                },
+                "workout_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "workout.EntryResponse": {
+            "type": "object",
+            "properties": {
+                "calories_burned": {
+                    "type": "number",
+                    "example": 53.3
+                },
+                "calories_estimated": {
+                    "description": "CaloriesEstimated is true when the server calculated the calories (MET x weight x time).",
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2026-10-19T07:30:00Z"
+                },
+                "distance_m": {
+                    "type": "number"
+                },
+                "duration_estimated": {
+                    "description": "DurationEstimated is true when the server estimated the duration from the number of sets.",
+                    "type": "boolean"
+                },
+                "duration_min": {
+                    "type": "number",
+                    "example": 7.5
+                },
+                "exercise_id": {
+                    "type": "string"
+                },
+                "exercise_name": {
+                    "type": "string",
+                    "example": "Bench Press"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "0199c2a4-7b1e-7c3a-9d5e-2f6a8b4c1d90"
+                },
+                "position": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "reps": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "sets": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "weight_kg": {
+                    "description": "WeightKG is absent for bodyweight exercises.",
+                    "type": "number"
+                },
+                "workout_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "workout.TotalsResponse": {
+            "type": "object",
+            "properties": {
+                "calories_burned": {
+                    "type": "number",
+                    "example": 210.5
+                },
+                "duration_min": {
+                    "type": "number",
+                    "example": 30
+                },
+                "entries": {
+                    "type": "integer",
+                    "example": 4
+                },
+                "sets": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "volume_kg": {
+                    "type": "number",
+                    "example": 3600
+                }
+            }
+        },
+        "workout.UpdateEntryRequest": {
+            "type": "object",
+            "properties": {
+                "calories_burned": {
+                    "type": "number",
+                    "maximum": 20000,
+                    "minimum": 0
+                },
+                "distance_m": {
+                    "type": "number",
+                    "maximum": 1000000,
+                    "minimum": 0
+                },
+                "duration_min": {
+                    "type": "number",
+                    "maximum": 1440
+                },
+                "reps": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1
+                },
+                "sets": {
+                    "type": "integer",
+                    "maximum": 50,
+                    "minimum": 1
+                },
+                "weight_kg": {
+                    "type": "number",
+                    "maximum": 1000,
+                    "minimum": 0
+                }
+            }
+        },
+        "workout.UpdateWorkoutRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "example": "Push day"
+                },
+                "notes": {
+                    "type": "string",
+                    "maxLength": 2000
+                }
+            }
+        },
+        "workout.WorkoutListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/workout.WorkoutResponse"
+                    }
+                }
+            }
+        },
+        "workout.WorkoutResponse": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/workout.EntryResponse"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "local_date": {
+                    "type": "string",
+                    "example": "2026-10-19"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string",
+                    "example": "2026-10-19T07:30:00Z"
+                },
+                "totals": {
+                    "$ref": "#/definitions/workout.TotalsResponse"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and the access token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
